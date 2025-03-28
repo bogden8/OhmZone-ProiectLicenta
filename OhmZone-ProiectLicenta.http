@@ -1,0 +1,6 @@
+@OhmZone_ProiectLicenta_HostAddress = http://localhost:5097
+
+GET {{OhmZone_ProiectLicenta_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
