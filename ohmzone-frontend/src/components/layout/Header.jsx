@@ -8,11 +8,11 @@ export default function Header() {
             <nav className="flex items-center space-x-4">
                 <Link to="/repair-guides" className="hover:underline">Fix your stuff</Link> 
                 <Link to="/robotics" className="hover:underline">Robotics</Link>
-                <Link to="/community" className="hover:underline">Community</Link>
+                <Link to="/forum" className="hover:underline">Forum</Link>
                 <input type="text" placeholder="Search" className="border p-1 rounded" />
                 <button className="px-2 py-1 border rounded">EN</button>
                 <Link to="/login" className="hover:underline">Login</Link>
             </nav>
         </header>
-    );
+    ); 
 }
