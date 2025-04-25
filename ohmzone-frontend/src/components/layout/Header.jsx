@@ -3,16 +3,32 @@ import { Link } from 'react-router-dom';
 
 export default function Header() {
     return (
-        <header className="flex justify-between items-center px-4 py-3 border-b bg-white">
-            <Link to="/" className="text-2xl font-bold">OhmZone</Link>
-            <nav className="flex items-center space-x-4">
-                <Link to="/repair-guides" className="hover:underline">Fix your stuff</Link> 
-                <Link to="/robotics" className="hover:underline">Robotics</Link>
-                <Link to="/forum" className="hover:underline">Forum</Link>
-                <input type="text" placeholder="Search" className="border p-1 rounded" />
-                <button className="px-2 py-1 border rounded">EN</button>
-                <Link to="/login" className="hover:underline">Login</Link>
-            </nav>
+        <header className="sticky top-0 z-50 bg-navbar-bg text-white py-3 shadow-md">
+            <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
+                {/* Stânga: Logo + meniul */}
+                <div className="flex items-center gap-12">
+                    <Link to="/" className="text-5xl font-bold font-jersey">
+                        OhmZone
+                    </Link>
+
+                    <nav className="flex items-center gap-8 font-bold text-sm">
+                        <Link to="/repair-guides" className="hover:underline">Fix your stuff</Link>
+                        <Link to="/robotics" className="hover:underline">Robotics</Link>
+                        <Link to="/forum" className="hover:underline">Forum</Link>
+                    </nav>
+                </div>
+
+                {/* Dreapta: Search + RO + Login */}
+                <div className="flex items-center gap-4">
+                    <input
+                        type="text"
+                        placeholder="search"
+                        className="bg-gray-300 text-black px-6 py-2 rounded-full text-base w-64 placeholder-black"
+                    />
+                    <button className="bg-gray-300 text-black rounded-md px-3 py-1 font-bold text-sm">RO</button>
+                    <Link to="/login" className="hover:underline text-sm font-bold">Login</Link>
+                </div>
+            </div>
         </header>
-    ); 
+    );
 }

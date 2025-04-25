@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function HomePage() {
@@ -11,7 +11,6 @@ export default function HomePage() {
                     Start Fixing Your Stuff
                 </Link>
             </section>
-
 
             <section className="py-16 bg-gray-100 text-center">
                 <h2 className="text-3xl font-bold mb-8">Browse by Category</h2>
@@ -27,7 +26,6 @@ export default function HomePage() {
                     </div>
                 </div>
             </section>
-
 
             <section className="bg-white py-16">
                 <div className="max-w-4xl mx-auto text-center">
