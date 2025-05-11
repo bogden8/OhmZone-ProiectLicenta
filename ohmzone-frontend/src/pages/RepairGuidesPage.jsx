@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";   // ← import Link here
 
 const categories = [
     { name: "PC Laptop", slug: "pc-laptop" },
@@ -10,45 +10,53 @@ const categories = [
 ];
 
 export default function RepairGuidesPage() {
-    const navigate = useNavigate();
     return (
-        <>
-          
+        <div className="bg-white">
+            {/* Titlu */}
+            <h1 className="text-center text-4xl font-bold font-jersey pt-6">
+                Repair guides
+            </h1>
 
-            <main className="container">
-                <h1>Repair guides</h1>
+            {/* Imagine banner */}
+            <div className="w-full mt-4">
                 <img
-                    src="https://via.placeholder.com/800x200"
-                    alt="Banner"
-                    style={{ width: '100%', borderRadius: 4, margin: '1rem 0' }}
+                    src="/assets/repair-banner.jpg"
+                    alt="Repair banner"
+                    className="w-full h-64 object-cover rounded"
                 />
+            </div>
 
-                <h2>Category</h2>
-                <div className="grid columns-3">
-                    {categories.map(cat => (
-                        <div
-                            key={cat.slug}
-                            className="card"
-                            onClick={() => navigate(`/guides/${cat.slug}`)}
-                        >
-                            {cat.name}
-                        </div>
-                    ))}
-                </div>
+            {/* Titlu categorii */}
+            <h2 className="text-center text-xl font-bold mt-10 mb-6">Category</h2>
 
-                <section style={{ display: 'flex', marginTop: '2rem', background: '#eee', padding: '1rem', borderRadius: 4 }}>
-                    <p style={{ flex: 1 }}>
-                        Importanța dreptului de a repara
-                    </p>
-                    <img
-                        src="https://via.placeholder.com/200"
-                        alt="Right to repair"
-                        style={{ width: 200, borderRadius: 4, marginLeft: '1rem' }}
-                    />
-                </section>
-            </main>
+            {/* Grid categorii */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-4">
+                {categories.map((cat) => (
+                    <Link
+                        key={cat.slug}
+                        to={
+                            cat.slug === "phone"
+                                ? "/repair-guides/phone"
+                                : `/guides/${encodeURIComponent(cat.slug)}`
+                        }
+                        className="bg-gray-300 hover:bg-gray-400 transition cursor-pointer text-center p-8 font-bold text-lg rounded"
+                    >
+                        {cat.name}
+                    </Link>
+                ))}
+            </div>
 
-            
-        </>
+            {/* Secțiunea despre dreptul de a repara */}
+            <div className="bg-gray-300 mt-16 py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8 rounded">
+                <p className="text-black font-bold text-sm max-w-md">
+                    Importanța dreptului de a repara
+                </p>
+                <img
+                    src="/assets/right-repair.jpg"
+                    alt="Right to repair"
+                    className="w-52 h-auto rounded-xl object-cover"
+                />
+            </div>
+        </div>
     );
 }
