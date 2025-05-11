@@ -19,13 +19,13 @@ export default function HomePage() {
                     <Link to="/repair-guides" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
                         <h3 className="text-xl font-semibold">Ghiduri de reparatii</h3>
                     </Link>
-                    <Link to="/repair-guides" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
+                    <Link to="/robotics" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
                         <h3 className="text-xl font-semibold">Invata robotica</h3>
                     </Link>
                     <Link to="/repair-guides" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
                         <h3 className="text-xl font-semibold">Dreptul de a repara</h3>
                     </Link>
-                    <Link to="/repair-guides" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
+                    <Link to="/forum" className="bg-navbar-bg hover:bg-black text-white p-8 text-lg font-bold rounded text-center cursor-pointer transition">
                         <h3 className="text-xl font-semibold">Pune o intrebare</h3>
                     </Link>
                 </div>

@@ -9,19 +9,24 @@ namespace OhmZone_ProiectLicenta.Models
         [Key]
         public int UserID { get; set; }
 
+        [Required]
         public string Username { get; set; }
-        public string Email { get; set; }
-        public string PasswordHash { get; set; }
-        public string Role { get; set; }
-        public DateTime CreatedAt { get; set; }
 
-        // Navigation properties for related entities
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string PasswordHash { get; set; }
+
+        public string Role { get; set; } = "User";
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // navigații...
         public ICollection<RepairGuides> RepairGuides { get; set; }
         public ICollection<ForumThreads> ForumThreads { get; set; }
         public ICollection<ForumReplies> ForumReplies { get; set; }
         public ICollection<GuideComments> GuideComments { get; set; }
-
-        // Add the navigation property for RoboticsTutorials
-        public ICollection<RoboticsTutorials> RoboticsTutorials { get; set; }  // This is the new property
+        public ICollection<RoboticsTutorials> RoboticsTutorials { get; set; }
     }
 }

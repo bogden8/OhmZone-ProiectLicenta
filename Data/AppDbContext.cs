@@ -76,7 +76,16 @@
                 .WithMany(u => u.RoboticsTutorials)
                 .HasForeignKey(rt => rt.AuthorID);
 
-            
+            modelBuilder.Entity<Users>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Users>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+
+
         }
     }
 }
