@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OhmZone_ProiectLicenta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OhmZone_ProiectLicenta.Services;
+using OhmZone_ProiectLicenta.Models;
+using OhmZone_ProiectLicenta.Models.Dtos;
 
 namespace OhmZone_ProiectLicenta.Controllers
 {
@@ -8,71 +10,54 @@ namespace OhmZone_ProiectLicenta.Controllers
     [Route("api/[controller]")]
     public class RepairGuideController : ControllerBase
     {
-        private readonly IRepairGuideService _repairGuideService;
+        private readonly IRepairGuideService _svc;
+        public RepairGuideController(IRepairGuideService svc) => _svc = svc;
 
-        public RepairGuideController(IRepairGuideService repairGuideService)
-        {
-            _repairGuideService = repairGuideService;
-        }
+        // --- pentru toți utilizatorii ---
 
+        // GET /api/repairguide
         [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var guides = await _repairGuideService.GetAllGuidesAsync();
-            return Ok(guides);
-        }
+        public async Task<IActionResult> GetAll() =>
+            Ok(await _svc.GetAllGuidesAsync());
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var guide = await _repairGuideService.GetGuideByIdAsync(id);
-            if (guide == null)
-                return NotFound();
+        // GET /api/repairguide/{id}
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> Get(int id) =>
+            Ok(await _svc.GetGuideByIdAsync(id));
 
-            return Ok(guide);
-        }
+        // --- doar ADMIN poate crea, edita sau șterge ---
 
-        [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string term)
-        {
-            var results = await _repairGuideService.SearchGuidesAsync(term);
-            return Ok(results);
-        }
-
-        [HttpGet("category/{categoryName}")]
-        public async Task<IActionResult> GetByCategory(string categoryName)
-        {
-            var guides = await _repairGuideService.GetGuidesByCategoryAsync(categoryName);
-            return Ok(guides);
-        }
-
+        // POST /api/repairguide
+      
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] RepairGuides guide)
+        public async Task<IActionResult> Create([FromBody] CreateRepairGuideDto dto)
         {
-            var created = await _repairGuideService.CreateGuideAsync(guide);
-            return CreatedAtAction(nameof(GetById), new { id = created.GuideID }, created);
+            var guide = await _svc.CreateAsync(dto);
+            return CreatedAtAction(
+               nameof(Get),
+               new { id = guide.GuideID },
+               new { guideID = guide.GuideID, nextUrl = $"/admin/guides/{guide.GuideID}/steps" }
+            );
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] RepairGuides guide)
+        // PUT /api/repairguide/{id}
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateRepairGuideDto dto)
         {
-            if (id != guide.GuideID)
-                return BadRequest("ID mismatch");
-
-            var updated = await _repairGuideService.UpdateGuideAsync(guide);
-            if (updated == null)
-                return NotFound();
-
+            var updated = await _svc.UpdateAsync(id, dto);
+            if (updated == null) return NotFound();
             return Ok(updated);
         }
 
-        [HttpDelete("{id}")]
+        // DELETE /api/repairguide/{id}
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _repairGuideService.DeleteGuideAsync(id);
-            if (!deleted)
-                return NotFound();
-
+            var deleted = await _svc.DeleteAsync(id);
+            if (!deleted) return NotFound();
             return NoContent();
         }
     }

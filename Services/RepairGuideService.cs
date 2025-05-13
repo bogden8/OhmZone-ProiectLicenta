@@ -1,36 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
+using OhmZone_ProiectLicenta.Models.Dtos;
 
 namespace OhmZone_ProiectLicenta.Services
 {
-    public interface IRepairGuideService
-    {
-        Task<IEnumerable<RepairGuides>> GetAllGuidesAsync();
-        Task<RepairGuides> GetGuideByIdAsync(int id);
-        Task<IEnumerable<RepairGuides>> SearchGuidesAsync(string searchTerm);
-        Task<RepairGuides> CreateGuideAsync(RepairGuides guide);
-        Task<RepairGuides> UpdateGuideAsync(RepairGuides guide);
-        Task<bool> DeleteGuideAsync(int id);
-        Task<IEnumerable<RepairGuides>> GetGuidesByCategoryAsync(string category);
-    }
-
     public class RepairGuideService : IRepairGuideService
     {
         private readonly AppDbContext _context;
         private readonly ILogger<RepairGuideService> _logger;
 
-        public RepairGuideService(AppDbContext context, ILogger<RepairGuideService> logger)
+        public RepairGuideService(
+            AppDbContext context,
+            ILogger<RepairGuideService> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        // --- Create a new manual guide ---
+        public async Task<RepairGuides> CreateAsync(CreateRepairGuideDto dto)
+        {
+            var guide = new RepairGuides
+            {
+                Title = dto.Title,
+                CategoryID = dto.CategoryID,
+                AuthorID = dto.AuthorID,
+                DeviceID = dto.DeviceID,
+                Part = dto.Part,
+                Content = dto.Content,
+                Rating = 0f,
+                DatePublished = DateTime.UtcNow
+            };
+
+            _context.RepairGuides.Add(guide);
+            await _context.SaveChangesAsync();
+            return guide;
+        }
+
+        // --- Read all ---
         public async Task<IEnumerable<RepairGuides>> GetAllGuidesAsync()
         {
             try
@@ -42,129 +54,67 @@ namespace OhmZone_ProiectLicenta.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving all repair guides");
+                _logger.LogError(ex, "Error retrieving all repair guides");
                 throw;
             }
         }
 
+        // --- Read by ID ---
         public async Task<RepairGuides> GetGuideByIdAsync(int id)
         {
             try
             {
-                var guide = await _context.RepairGuides
-                    .Include(g => g.Category)
-                    .Include(g => g.Author)
-                    .Include(g => g.GuideComments)
-                    .FirstOrDefaultAsync(g => g.GuideID == id); // <- modificat Id în GuideID
-
-                return guide;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while retrieving repair guide with ID: {id}");
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<RepairGuides>> SearchGuidesAsync(string searchTerm)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(searchTerm))
-                    return await GetAllGuidesAsync();
-
                 return await _context.RepairGuides
                     .Include(g => g.Category)
                     .Include(g => g.Author)
-                    .Where(g => g.Title.Contains(searchTerm) ||
-                                g.Content.Contains(searchTerm) || // Description nu există, am folosit Content
-                                g.Category.CategoryName.Contains(searchTerm)) // <- modificat Name în CategoryName
-                    .ToListAsync();
+                    .Include(g => g.GuideComments)
+                    .FirstOrDefaultAsync(g => g.GuideID == id);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error occurred while searching repair guides with term: {searchTerm}");
+                _logger.LogError(ex, $"Error retrieving guide with ID {id}");
                 throw;
             }
         }
 
-        public async Task<RepairGuides> CreateGuideAsync(RepairGuides guide)
+        // --- Update existing ---
+        public async Task<RepairGuides> UpdateAsync(int guideId, UpdateRepairGuideDto dto)
         {
             try
             {
-                guide.DatePublished = DateTime.UtcNow;
+                var existing = await _context.RepairGuides.FindAsync(guideId);
+                if (existing == null) return null;
 
-                _context.RepairGuides.Add(guide);
-                await _context.SaveChangesAsync();
-
-                return guide;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while creating a new repair guide");
-                throw;
-            }
-        }
-
-        public async Task<RepairGuides> UpdateGuideAsync(RepairGuides guide)
-        {
-            try
-            {
-                var existingGuide = await _context.RepairGuides.FindAsync(guide.GuideID); // <- modificat Id în GuideID
-
-                if (existingGuide == null)
-                    return null;
-
-                guide.DatePublished = existingGuide.DatePublished;
-
-                _context.Entry(existingGuide).State = EntityState.Detached;
-                _context.Entry(guide).State = EntityState.Modified;
+                existing.Title = dto.Title;
+                existing.CategoryID = dto.CategoryID;
+                existing.Content = dto.Content;
+                // If you have Rating or other fields, map them here
 
                 await _context.SaveChangesAsync();
-
-                return guide;
+                return existing;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error occurred while updating repair guide with ID: {guide.GuideID}");
+                _logger.LogError(ex, $"Error updating guide with ID {guideId}");
                 throw;
             }
         }
 
-        public async Task<bool> DeleteGuideAsync(int id)
+        // --- Delete ---
+        public async Task<bool> DeleteAsync(int guideId)
         {
             try
             {
-                var guide = await _context.RepairGuides.FindAsync(id);
-
-                if (guide == null)
-                    return false;
+                var guide = await _context.RepairGuides.FindAsync(guideId);
+                if (guide == null) return false;
 
                 _context.RepairGuides.Remove(guide);
                 await _context.SaveChangesAsync();
-
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error occurred while deleting repair guide with ID: {id}");
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<RepairGuides>> GetGuidesByCategoryAsync(string category)
-        {
-            try
-            {
-                return await _context.RepairGuides
-                    .Include(g => g.Category)
-                    .Include(g => g.Author)
-                    .Where(g => g.Category.CategoryName == category) // <- modificat Name în CategoryName
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error occurred while retrieving repair guides for category: {category}");
+                _logger.LogError(ex, $"Error deleting guide with ID {guideId}");
                 throw;
             }
         }

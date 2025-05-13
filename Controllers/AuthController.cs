@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OhmZone_ProiectLicenta.Dtos;
+using OhmZone_ProiectLicenta.Models.Dtos;
 using OhmZone_ProiectLicenta.Services;
 
 [ApiController]

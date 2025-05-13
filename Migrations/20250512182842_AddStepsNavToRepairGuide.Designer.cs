@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OhmZone_ProiectLicenta.Data;
 
@@ -11,9 +12,11 @@ using OhmZone_ProiectLicenta.Data;
 namespace OhmZone_ProiectLicenta.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250512182842_AddStepsNavToRepairGuide")]
+    partial class AddStepsNavToRepairGuide
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,52 +24,6 @@ namespace OhmZone_ProiectLicenta.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ForumPost", b =>
-                {
-                    b.Property<int>("ThreadID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ThreadID"));
-
-                    b.Property<string>("About")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AuthorID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DatePosted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Device")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ThreadID");
-
-                    b.HasIndex("AuthorID");
-
-                    b.HasIndex("CategoryID");
-
-                    b.ToTable("ForumThreads");
-                });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.Categories", b =>
                 {
@@ -150,6 +107,40 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("ForumReplies");
+                });
+
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumThreads", b =>
+                {
+                    b.Property<int>("ThreadID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ThreadID"));
+
+                    b.Property<int>("AuthorID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DatePosted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ThreadID");
+
+                    b.HasIndex("AuthorID");
+
+                    b.HasIndex("CategoryID");
+
+                    b.ToTable("ForumThreads");
                 });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.GuideComments", b =>
@@ -345,7 +336,26 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ForumPost", b =>
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumReplies", b =>
+                {
+                    b.HasOne("OhmZone_ProiectLicenta.Models.ForumThreads", "Thread")
+                        .WithMany("ForumReplies")
+                        .HasForeignKey("ThreadID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OhmZone_ProiectLicenta.Models.Users", "User")
+                        .WithMany("ForumReplies")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Thread");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumThreads", b =>
                 {
                     b.HasOne("OhmZone_ProiectLicenta.Models.Users", "Author")
                         .WithMany("ForumThreads")
@@ -362,25 +372,6 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Navigation("Author");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumReplies", b =>
-                {
-                    b.HasOne("ForumPost", "Thread")
-                        .WithMany("ForumReplies")
-                        .HasForeignKey("ThreadID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OhmZone_ProiectLicenta.Models.Users", "User")
-                        .WithMany("ForumReplies")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Thread");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.GuideComments", b =>
@@ -451,11 +442,6 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Navigation("Guide");
                 });
 
-            modelBuilder.Entity("ForumPost", b =>
-                {
-                    b.Navigation("ForumReplies");
-                });
-
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.Categories", b =>
                 {
                     b.Navigation("RepairGuides");
@@ -464,6 +450,11 @@ namespace OhmZone_ProiectLicenta.Migrations
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumCategories", b =>
                 {
                     b.Navigation("ForumThreads");
+                });
+
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumThreads", b =>
+                {
+                    b.Navigation("ForumReplies");
                 });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.RepairGuides", b =>

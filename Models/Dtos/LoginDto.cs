@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OhmZone_ProiectLicenta.Dtos
+namespace OhmZone_ProiectLicenta.Models.Dtos
 {
     public class LoginDto
     {

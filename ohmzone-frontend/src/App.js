@@ -10,7 +10,15 @@ import RepairGuidesPage from './pages/RepairGuidesPage';
 import PhoneTypeSelectionPage from './pages/PhoneTypePage';
 import ModelSelectionPage from './pages/ModelSelectionPage';
 import GuideTypePage from './pages/GuideTypePage';
-
+import RoboticsPage from './pages/RoboticsPage';
+import { AddTutorialPage } from './pages/AddTutorialPage';
+import { AddProjectPage } from './pages/AddProjectPage';
+import EditRepairGuide from './pages/EditRepairGuide';
+import PrivateRoute from './components/PrivateRoute';
+import AddRepairGuidePage from './pages/AddRepairGuidePage';
+import ForumPage from './pages/ForumPage';
+import ForumAskPage from './pages/ForumAskPage';
+import ForumPostPage from './pages/ForumPostPage';
 // ‼️ Importă doar paginile de autentificare ‼️
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
@@ -27,6 +35,23 @@ function App() {
                 <Route path="/repair-guides/phone" element={<PhoneTypeSelectionPage />} />
                 <Route path="/repair-guides/phone/:phoneType" element={<ModelSelectionPage />} />
                 <Route path="/repair-guides/phone/:phoneType/:model" element={<GuideTypePage />} />
+                <Route path="/robotics" element={<RoboticsPage />} />
+                <Route path="/robotics/new-tutorial" element={<AddTutorialPage />} />
+                <Route path="/robotics/new-project" element={<AddProjectPage />} />
+                <Route path="/forum" element={<ForumPage />} />
+                <Route path="/forum/ask" element={<ForumAskPage />} />
+                <Route path="/forum/post/:id" element={<ForumPostPage />} />
+
+                <Route path="/admin/guides/:id/edit" element={
+                    <PrivateRoute allowedRoles={['Admin']}>
+                        <EditRepairGuide />
+                    </PrivateRoute>
+                } />
+
+                <Route
+                    path="/admin/guides/new"
+                    element={<AddRepairGuidePage />}
+                />
 
                 {/* Rutele de autentificare, fără forum */}
                 <Route path="/register" element={<RegisterPage />} />

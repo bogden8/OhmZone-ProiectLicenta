@@ -9,7 +9,7 @@ namespace OhmZone_ProiectLicenta.Models
         public int ReplyID { get; set; }
         public int ThreadID { get; set; }
         [ForeignKey("ThreadID")]
-        public ForumThreads Thread { get; set; }
+        public ForumPost Thread { get; set; }
 
         public int UserID { get; set; }
         [ForeignKey("UserID")]

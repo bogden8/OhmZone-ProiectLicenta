@@ -8,6 +8,6 @@ namespace OhmZone_ProiectLicenta.Models
         public int CategoryID { get; set; }
         public string CategoryName { get; set; }
 
-        public List<ForumThreads> ForumThreads { get; set; }
+        public List<ForumPost> ForumThreads { get; set; }
     }
 }

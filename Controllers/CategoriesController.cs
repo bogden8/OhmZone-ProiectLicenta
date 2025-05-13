@@ -1,6 +1,42 @@
-﻿namespace OhmZone_ProiectLicenta.Controllers
+﻿// Controllers/CategoriesController.cs
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OhmZone_ProiectLicenta.Data;
+using OhmZone_ProiectLicenta.Models;
+
+namespace OhmZone_ProiectLicenta.Controllers
 {
-    public class CategoriesController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CategoriesController : ControllerBase
     {
+        private readonly AppDbContext _ctx;
+        public CategoriesController(AppDbContext ctx) => _ctx = ctx;
+
+        // GET /api/categories
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var cats = await _ctx.Categories
+                                 .OrderBy(c => c.CategoryName)
+                                 .ToListAsync();
+            return Ok(cats);
+        }
+
+        // (Optional) POST /api/categories to add new ones on the fly
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] Categories c)
+        {
+            // avoid duplicates
+            var existing = await _ctx.Categories
+                                    .FirstOrDefaultAsync(x => x.CategoryName == c.CategoryName);
+            if (existing != null)
+                return Ok(existing);
+
+            _ctx.Categories.Add(c);
+            await _ctx.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetAll), new { id = c.CategoryID }, c);
+        }
     }
 }

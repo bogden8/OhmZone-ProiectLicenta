@@ -1,5 +1,7 @@
-﻿import React from "react";
-import { Link } from "react-router-dom";   // ← import Link here
+﻿// src/pages/RepairGuidesPage.jsx
+import React from "react";
+import { Link } from "react-router-dom";
+import * as jwt from "jwt-decode";   // ← named import
 
 const categories = [
     { name: "PC Laptop", slug: "pc-laptop" },
@@ -10,12 +12,52 @@ const categories = [
 ];
 
 export default function RepairGuidesPage() {
+    const token = localStorage.getItem("oz_token");
+    let isAdmin = false;
+
+    if (token) {
+        try {
+            // 1) split into header.payload.signature
+            const parts = token.split(".");
+            if (parts.length === 3) {
+                // 2) base64‐decode the payload
+                const payloadJson = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
+                const payload = JSON.parse(payloadJson);
+                console.log("JWT payload:", payload);
+
+                // 3) figure out which property holds the role
+                // common possibilities:
+                const roleClaim =
+                    payload.role ||
+                    payload.Role ||
+                    (Array.isArray(payload.roles) ? payload.roles[0] : undefined) ||
+                    payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+                console.log("Detected roleClaim:", roleClaim);
+                isAdmin = roleClaim === "Admin";
+            }
+        } catch (e) {
+            console.error("Error decoding JWT:", e);
+        }
+    }
+
     return (
         <div className="bg-white">
-            {/* Titlu */}
-            <h1 className="text-center text-4xl font-bold font-jersey pt-6">
-                Repair guides
-            </h1>
+            <div className="flex items-center justify-between max-w-5xl mx-auto px-4 pt-6">
+                <h1 className="text-4xl font-bold font-jersey">
+                    Repair guides
+                </h1>
+
+                {/* now this will show if isAdmin became true */}
+                {isAdmin && (
+                    <Link
+                        to="/admin/guides/new"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
+                    >
+                        Adaugă ghid
+                    </Link>
+                )}
+            </div>
 
             {/* Imagine banner */}
             <div className="w-full mt-4">
@@ -31,7 +73,7 @@ export default function RepairGuidesPage() {
 
             {/* Grid categorii */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-4">
-                {categories.map((cat) => (
+                {categories.map(cat => (
                     <Link
                         key={cat.slug}
                         to={
@@ -46,7 +88,7 @@ export default function RepairGuidesPage() {
                 ))}
             </div>
 
-            {/* Secțiunea despre dreptul de a repara */}
+            {/* Despre dreptul de a repara */}
             <div className="bg-gray-300 mt-16 py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8 rounded">
                 <p className="text-black font-bold text-sm max-w-md">
                     Importanța dreptului de a repara
