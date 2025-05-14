@@ -19,11 +19,11 @@ public class ForumPost
     public string Content { get; set; }
     public DateTime DatePosted { get; set; }
 
-    // ✅ Adăugări pentru forum extins
-    public string? ImageUrl { get; set; } // pentru poza
-    public string? Type { get; set; }     // question/project/discussion
-    public string? About { get; set; }    // robotics/guide/other
-    public string? Device { get; set; }   // PC Laptop, Phone etc.
+   
+    public string? ImageUrl { get; set; } 
+    public string? Type { get; set; }     
+    public string? About { get; set; }    
+    public string? Device { get; set; }  
 
     public List<ForumReplies> ForumReplies { get; set; } = new();
 }

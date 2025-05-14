@@ -49,21 +49,21 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginAsync(string usernameOrEmail, string password)
     {
-        // 1) Ia primul user care se potrivește
+        
         var user = await _ctx.Users.FirstOrDefaultAsync(u =>
             u.Email == usernameOrEmail ||
             u.Username == usernameOrEmail);
 
-        // 2) Dacă nu există deloc
+        
         if (user == null)
             throw new ApplicationException("Utilizator inexistent");
 
-        // 3) Verifică parola
+        
         var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, password);
         if (result == PasswordVerificationResult.Failed)
             throw new ApplicationException("Parolă incorectă");
 
-        // 4) Construiește claims (inclusiv rolul)
+        
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub,  user.UserID.ToString()),

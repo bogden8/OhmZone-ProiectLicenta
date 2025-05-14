@@ -1,5 +1,4 @@
-﻿// src/pages/AddRepairGuidePage.jsx
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import api from '../utils/api';
@@ -8,19 +7,19 @@ import { createDevice, createRepairGuide } from '../utils/api';
 export default function AddRepairGuidePage() {
     const nav = useNavigate();
 
-    // form state
+    
     const [device, setDevice] = useState('');
     const [part, setPart] = useState('');
     const [title, setTitle] = useState('');
     const [error, setError] = useState('');
     const [authorID, setAuthorID] = useState(null);
 
-    // dropdown data
+    
     const [devices, setDevices] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [categoryID, setCategoryID] = useState('');  // <-- start as empty string
+    const [categoryID, setCategoryID] = useState('');  
 
-    // load categories
+    
     useEffect(() => {
         api.get('/categories')
             .then(r => {
@@ -30,13 +29,13 @@ export default function AddRepairGuidePage() {
                 }
             })
             .catch(() => {
-                // fallback if needed
+                
                 setCategories([{ categoryID: 1, categoryName: 'General' }]);
                 setCategoryID(1);
             });
     }, []);
 
-    // decode user ID from token
+    
     useEffect(() => {
         const token = localStorage.getItem('oz_token');
         if (!token) return;
@@ -48,7 +47,7 @@ export default function AddRepairGuidePage() {
         }
     }, []);
 
-    // load or seed devices
+    
     useEffect(() => {
         api.get('/devices')
             .then(r => setDevices(r.data))
@@ -71,7 +70,7 @@ export default function AddRepairGuidePage() {
         }
         setError('');
 
-        // find or create device
+        
         let deviceRecord = devices.find(d => d.name === device);
         if (!deviceRecord) {
             try {
@@ -83,15 +82,15 @@ export default function AddRepairGuidePage() {
             }
         }
 
-        // create guide
+       
         try {
             const { guideID, nextUrl } = await createRepairGuide({
                 title,
-                categoryID,                    // now comes from dropdown
+                categoryID,                    
                 authorID,
                 deviceID: deviceRecord.deviceID,
                 part,
-                content: JSON.stringify({})    // or more structured payload
+                content: JSON.stringify({})    
             });
             nav(nextUrl);
         } catch (err) {
@@ -111,7 +110,7 @@ export default function AddRepairGuidePage() {
                 <p className="font-semibold mb-2">Introducere</p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Device */}
+                    
                     <div>
                         <label className="block mb-1 font-semibold">Device</label>
                         <input
@@ -129,7 +128,7 @@ export default function AddRepairGuidePage() {
                         </datalist>
                     </div>
 
-                    {/* Category */}
+                    
                     <div>
                         <label className="block mb-1 font-semibold">Categorie</label>
                         <select
@@ -149,7 +148,7 @@ export default function AddRepairGuidePage() {
                         </select>
                     </div>
 
-                    {/* Part */}
+                    
                     <div>
                         <label className="block mb-1 font-semibold">
                             What part are you replacing?
@@ -164,7 +163,7 @@ export default function AddRepairGuidePage() {
                         />
                     </div>
 
-                    {/* Titlu */}
+                   
                     <div>
                         <label className="block mb-1 font-semibold">Titlu</label>
                         <input
@@ -177,7 +176,7 @@ export default function AddRepairGuidePage() {
                         />
                     </div>
 
-                    {/* Save button */}
+                    
                     <div className="flex justify-end">
                         <button
                             type="submit"
@@ -187,7 +186,7 @@ export default function AddRepairGuidePage() {
                         </button>
                     </div>
 
-                    {/* Error message */}
+                    
                     {error && (
                         <div className="mt-4 text-red-600 font-medium">
                             {error}

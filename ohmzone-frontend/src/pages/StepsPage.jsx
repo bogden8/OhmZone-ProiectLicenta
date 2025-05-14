@@ -1,5 +1,4 @@
-﻿// src/pages/StepsPage.jsx
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -8,14 +7,14 @@ export default function StepsPage() {
     const nav = useNavigate();
     const [steps, setSteps] = useState([]);
 
-    // Load existing steps
+    
     useEffect(() => {
         api.get(`/repairguide/${guideID}/steps`)
             .then(res => setSteps(res.data))
             .catch(console.error);
     }, [guideID]);
 
-    // Add a blank step locally
+    
     const addStep = () => {
         setSteps(s => [
             ...s,
@@ -30,7 +29,7 @@ export default function StepsPage() {
         ]);
     };
 
-    // Handlers for text and images
+   
     const handleTextChange = (i, text) =>
         setSteps(s => s.map((st, idx) => idx === i ? { ...st, text } : st));
 
@@ -55,7 +54,7 @@ export default function StepsPage() {
             })
         );
 
-    // Save or update a single step
+    
     const saveStep = async i => {
         const step = steps[i];
         const form = new FormData();
@@ -94,7 +93,7 @@ export default function StepsPage() {
                     <h2 className="font-semibold">Pasul {i + 1}</h2>
 
                     <div className="flex space-x-4">
-                        {/* Main image */}
+                        
                         <div>
                             {st.mainImageUrl ? (
                                 <img
@@ -114,7 +113,7 @@ export default function StepsPage() {
                             />
                         </div>
 
-                        {/* Step text + Save */}
+                        
                         <div className="flex-1">
                             <input
                                 type="text"
@@ -132,7 +131,7 @@ export default function StepsPage() {
                         </div>
                     </div>
 
-                    {/* Thumbnails */}
+                   
                     <div className="flex space-x-2">
                         {[0, 1, 2].map(slot => (
                             <div key={slot} className="text-center">

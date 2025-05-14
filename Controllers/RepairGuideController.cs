@@ -13,21 +13,21 @@ namespace OhmZone_ProiectLicenta.Controllers
         private readonly IRepairGuideService _svc;
         public RepairGuideController(IRepairGuideService svc) => _svc = svc;
 
-        // --- pentru toți utilizatorii ---
+        
 
-        // GET /api/repairguide
+        
         [HttpGet]
         public async Task<IActionResult> GetAll() =>
             Ok(await _svc.GetAllGuidesAsync());
 
-        // GET /api/repairguide/{id}
+        
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id) =>
             Ok(await _svc.GetGuideByIdAsync(id));
 
-        // --- doar ADMIN poate crea, edita sau șterge ---
+        
 
-        // POST /api/repairguide
+        
       
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -41,7 +41,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             );
         }
 
-        // PUT /api/repairguide/{id}
+        
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateRepairGuideDto dto)
@@ -51,7 +51,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(updated);
         }
 
-        // DELETE /api/repairguide/{id}
+        
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)

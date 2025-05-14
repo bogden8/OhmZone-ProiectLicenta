@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
         }
         catch (ApplicationException ex)
         {
-            // Credentials invalid
+            
             return Unauthorized(new { error = ex.Message });
         }
     }

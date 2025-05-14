@@ -11,11 +11,11 @@ export default function AskQuestionPage() {
 
     const [categories, setCategories] = useState([]);
     const [categoryID, setCategoryID] = useState('');
-    const [authorID, setAuthorID] = useState(1); // ← înlocuiește cu ID-ul userului logat din JWT
+    const [authorID, setAuthorID] = useState(1); 
 
     const navigate = useNavigate();
 
-    // Încarcă categoriile din backend
+    
     useEffect(() => {
         fetch('http://localhost:5097/api/categories')
             .then(res => res.json())
@@ -43,8 +43,8 @@ export default function AskQuestionPage() {
         if (response.ok) {
             navigate('/forum');
         } else {
-            const errorText = await response.text(); // vezi ce trimite serverul
-            console.error('Eroare server:', errorText); // afișează eroarea în consolă
+            const errorText = await response.text(); 
+            console.error('Eroare server:', errorText); 
             alert('Eroare la trimiterea întrebării');
         }
 

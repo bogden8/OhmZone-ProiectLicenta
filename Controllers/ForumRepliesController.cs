@@ -18,14 +18,14 @@ namespace OhmZone_ProiectLicenta.Controllers
             _context = context;
         }
 
-        // ✅ Adaugă un răspuns la o postare
+        
         [HttpPost]
         public async Task<IActionResult> AddReply(int threadId, [FromBody] AddReplyDto dto)
         {
             var reply = new ForumReplies
             {
                 ThreadID = threadId,
-                UserID = dto.UserID, // ideal: obținut din JWT
+                UserID = dto.UserID, 
                 Content = dto.Content,
                 DatePosted = DateTime.UtcNow
             };
@@ -43,7 +43,7 @@ namespace OhmZone_ProiectLicenta.Controllers
 
         }
 
-        // ✅ Șterge un comentariu
+       
         [HttpDelete("{replyId}")]
         public async Task<IActionResult> DeleteReply(int threadId, int replyId)
         {
@@ -51,7 +51,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             if (reply == null || reply.ThreadID != threadId)
                 return NotFound();
 
-            // ideal: verifică dacă reply.UserID == utilizatorul logat
+            
 
             _context.ForumReplies.Remove(reply);
             await _context.SaveChangesAsync();

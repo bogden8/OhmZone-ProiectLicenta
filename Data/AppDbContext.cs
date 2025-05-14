@@ -19,12 +19,12 @@ namespace OhmZone_ProiectLicenta.Data
             }
         }
 
-        // ——— DbSet-uri ———
+        
         public DbSet<Users> Users { get; set; }
         public DbSet<RepairGuides> RepairGuides { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<GuideComments> GuideComments { get; set; }
-        public DbSet<ForumPost> ForumThreads { get; set; } // se numește ForumThreads în DB, dar modelul este ForumPost
+        public DbSet<ForumPost> ForumThreads { get; set; } 
         public DbSet<ForumReplies> ForumReplies { get; set; }
         public DbSet<ForumCategories> ForumCategories { get; set; }
         public DbSet<RoboticsTutorials> RoboticsTutorials { get; set; }

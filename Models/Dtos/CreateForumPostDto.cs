@@ -3,8 +3,8 @@
     public class CreateForumPostDto
     {
         public string Title { get; set; }
-        public int CategoryID { get; set; }  // legat de ForumCategories
-        public int AuthorID { get; set; }    // ideal: luat din JWT
+        public int CategoryID { get; set; }  
+        public int AuthorID { get; set; }    
         public string Content { get; set; }
 
         public string? Type { get; set; }

@@ -14,7 +14,7 @@ public class RoboticsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        // DTO simplu cu Id, Title, Description, ImageUrl
+        
         var items = await _ctx.RoboticsTutorials
             .Select(r => new {
                 r.TutorialID,

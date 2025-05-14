@@ -1,8 +1,7 @@
-﻿// src/pages/ModelSelectionPage.jsx
-import React from 'react';
+﻿import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-// map each phoneType slug → an array of model names
+
 const modelsByType = {
     'apple-iphone': ['iPhone 14', 'iPhone 13', 'iPhone 12', 'iPhone SE'],
     'android-phone': ['Galaxy S23', 'Pixel 7', 'OnePlus 11', 'Moto G'],

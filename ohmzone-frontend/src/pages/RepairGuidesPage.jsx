@@ -1,7 +1,6 @@
-﻿// src/pages/RepairGuidesPage.jsx
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
-import * as jwt from "jwt-decode";   // ← named import
+import * as jwt from "jwt-decode"; 
 
 const categories = [
     { name: "PC Laptop", slug: "pc-laptop" },
@@ -17,16 +16,15 @@ export default function RepairGuidesPage() {
 
     if (token) {
         try {
-            // 1) split into header.payload.signature
+            
             const parts = token.split(".");
             if (parts.length === 3) {
-                // 2) base64‐decode the payload
+                
                 const payloadJson = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
                 const payload = JSON.parse(payloadJson);
                 console.log("JWT payload:", payload);
 
-                // 3) figure out which property holds the role
-                // common possibilities:
+                
                 const roleClaim =
                     payload.role ||
                     payload.Role ||
@@ -48,7 +46,7 @@ export default function RepairGuidesPage() {
                     Repair guides
                 </h1>
 
-                {/* now this will show if isAdmin became true */}
+                
                 {isAdmin && (
                     <Link
                         to="/admin/guides/new"
@@ -59,7 +57,7 @@ export default function RepairGuidesPage() {
                 )}
             </div>
 
-            {/* Imagine banner */}
+           
             <div className="w-full mt-4">
                 <img
                     src="/assets/repair-banner.jpg"
@@ -68,10 +66,10 @@ export default function RepairGuidesPage() {
                 />
             </div>
 
-            {/* Titlu categorii */}
+            
             <h2 className="text-center text-xl font-bold mt-10 mb-6">Category</h2>
 
-            {/* Grid categorii */}
+           
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-4">
                 {categories.map(cat => (
                     <Link
@@ -88,7 +86,7 @@ export default function RepairGuidesPage() {
                 ))}
             </div>
 
-            {/* Despre dreptul de a repara */}
+            
             <div className="bg-gray-300 mt-16 py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8 rounded">
                 <p className="text-black font-bold text-sm max-w-md">
                     Importanța dreptului de a repara

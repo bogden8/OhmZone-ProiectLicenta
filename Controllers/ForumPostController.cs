@@ -19,7 +19,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             _env = env;
         }
 
-        // ✅ Creare postare (cu imagine opțională)
+        
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromForm] CreateForumPostDto dto)
         {
@@ -61,7 +61,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(thread);
         }
 
-        // ✅ Returnează doar datele utile – fără recursivitate infinită
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -88,7 +88,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(posts);
         }
 
-        // ✅ Detalii postare + răspunsuri
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

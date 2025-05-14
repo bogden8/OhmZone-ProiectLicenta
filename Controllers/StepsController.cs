@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OhmZone_ProiectLicenta.Models;
 using OhmZone_ProiectLicenta.Models.Dtos;
-using OhmZone_ProiectLicenta.Services;   // ← make sure this is here
+using OhmZone_ProiectLicenta.Services;  
 
 namespace OhmZone_ProiectLicenta.Controllers
 {
@@ -13,12 +13,12 @@ namespace OhmZone_ProiectLicenta.Controllers
         private readonly IStepService _stepSvc;
         public StepsController(IStepService stepSvc) => _stepSvc = stepSvc;
 
-        // GET /api/repairguide/{guideId}/steps
+        
         [HttpGet("{guideId:int}/steps")]
         public async Task<IActionResult> GetAll(int guideId) =>
             Ok(await _stepSvc.GetAllForGuideAsync(guideId));
 
-        // POST /api/repairguide/{guideId}/steps
+        
         [Authorize(Roles = "Admin")]
         [HttpPost("{guideId:int}/steps")]
         public async Task<IActionResult> Create(int guideId, [FromForm] CreateStepDto dto)
@@ -27,7 +27,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             return CreatedAtAction(nameof(GetAll), new { guideId }, step);
         }
 
-        // PUT /api/repairguide/steps/{stepId}
+        
         [Authorize(Roles = "Admin")]
         [HttpPut("steps/{stepId:int}")]
         public async Task<IActionResult> Update(int stepId, [FromForm] UpdateStepDto dto)

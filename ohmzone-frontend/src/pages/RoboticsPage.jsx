@@ -7,12 +7,12 @@ export default function RoboticsPage() {
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
 
-    // Decode role from token
+    
     const token = localStorage.getItem('oz_token');
     let role = null;
     if (token) {
         try {
-            // Role claim full name
+            
             role = jwtDecode(token)['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
         } catch { /* invalid token */ }
     }

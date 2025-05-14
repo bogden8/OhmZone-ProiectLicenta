@@ -6,7 +6,7 @@ export default function ForumPostPage() {
     const { id } = useParams();
     const [post, setPost] = useState(null);
     const [newComment, setNewComment] = useState('');
-    const [userID] = useState(1); // TODO: ia din JWT localStorage in versiunea finală
+    const [userID] = useState(1); 
     const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {

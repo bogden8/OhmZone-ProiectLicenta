@@ -14,14 +14,14 @@ namespace OhmZone_ProiectLicenta.Models
         [Required]
         public string Content { get; set; }
 
-        // ——— New properties ———
+        
         [Required]
         public string Description { get; set; }
 
         public string ImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        // ————————————————
+       
 
         public int AuthorID { get; set; }
         public double Rating { get; set; }

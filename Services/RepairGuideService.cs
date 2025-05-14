@@ -22,7 +22,7 @@ namespace OhmZone_ProiectLicenta.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // --- Create a new manual guide ---
+        
         public async Task<RepairGuides> CreateAsync(CreateRepairGuideDto dto)
         {
             var guide = new RepairGuides
@@ -42,7 +42,7 @@ namespace OhmZone_ProiectLicenta.Services
             return guide;
         }
 
-        // --- Read all ---
+       
         public async Task<IEnumerable<RepairGuides>> GetAllGuidesAsync()
         {
             try
@@ -59,7 +59,7 @@ namespace OhmZone_ProiectLicenta.Services
             }
         }
 
-        // --- Read by ID ---
+       
         public async Task<RepairGuides> GetGuideByIdAsync(int id)
         {
             try
@@ -77,7 +77,7 @@ namespace OhmZone_ProiectLicenta.Services
             }
         }
 
-        // --- Update existing ---
+        
         public async Task<RepairGuides> UpdateAsync(int guideId, UpdateRepairGuideDto dto)
         {
             try
@@ -88,7 +88,7 @@ namespace OhmZone_ProiectLicenta.Services
                 existing.Title = dto.Title;
                 existing.CategoryID = dto.CategoryID;
                 existing.Content = dto.Content;
-                // If you have Rating or other fields, map them here
+               
 
                 await _context.SaveChangesAsync();
                 return existing;
@@ -100,7 +100,7 @@ namespace OhmZone_ProiectLicenta.Services
             }
         }
 
-        // --- Delete ---
+       
         public async Task<bool> DeleteAsync(int guideId)
         {
             try

@@ -35,7 +35,7 @@ export default function HomePage() {
                 <div className="max-w-5xl mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-start gap-8">
 
-                        {/* Coloană de TEXT + heading */}
+                        
                         <div className="md:w-1/2 space-y-4">
                             <h1 className="text-4xl font-bold font-jersey">
                                 Bine ai venit pe OhmZone!
@@ -50,7 +50,7 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        {/* Coloană de IMAGINE */}
+                        
                         <div className="md:w-1/2">
                             <img
                                 src="/assets/laptop-homepage.jpg"
@@ -66,7 +66,7 @@ export default function HomePage() {
                 <div className="max-w-5xl mx-auto px-4">
                     <div className="flex flex-col md:flex-row items-start gap-8">
 
-                        {/* Coloană de TEXT + heading */}
+                        
                         <div className="md:w-1/2 space-y-4">
                             <h1 className="text-4xl font-bold font-jersey">
                                 Robotica
@@ -79,7 +79,7 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        {/* Coloană de IMAGINE */}
+                        
                         <div className="md:w-1/2">
                             <img
                                 src="/assets/Arduino-homepage.png"

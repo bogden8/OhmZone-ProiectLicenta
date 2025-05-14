@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;            // ← for ICollection<T>
+using System.Collections.Generic;            
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -20,7 +20,7 @@ namespace OhmZone_ProiectLicenta.Models
         [ForeignKey("AuthorID")]
         public Users Author { get; set; }
 
-        // ← your manual fields
+        
         public int DeviceID { get; set; }
         [ForeignKey("DeviceID")]
         public Device Device { get; set; }
@@ -33,7 +33,6 @@ namespace OhmZone_ProiectLicenta.Models
 
         public ICollection<GuideComments> GuideComments { get; set; }
 
-        // ← add this:
         public ICollection<Step> Steps { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿// src/App.jsx
-import React from 'react';
+﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Header from './components/layout/Header';
@@ -19,7 +18,7 @@ import AddRepairGuidePage from './pages/AddRepairGuidePage';
 import ForumPage from './pages/ForumPage';
 import ForumAskPage from './pages/ForumAskPage';
 import ForumPostPage from './pages/ForumPostPage';
-// ‼️ Importă doar paginile de autentificare ‼️
+
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 
@@ -29,7 +28,6 @@ function App() {
             <Header />
 
             <Routes>
-                {/* Flow-urile existente de pe site */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/repair-guides" element={<RepairGuidesPage />} />
                 <Route path="/repair-guides/phone" element={<PhoneTypeSelectionPage />} />
@@ -53,7 +51,7 @@ function App() {
                     element={<AddRepairGuidePage />}
                 />
 
-                {/* Rutele de autentificare, fără forum */}
+                
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>

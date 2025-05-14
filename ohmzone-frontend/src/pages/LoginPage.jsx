@@ -1,5 +1,4 @@
-﻿// src/pages/LoginPage.jsx
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -15,10 +14,10 @@ export default function LoginPage() {
             localStorage.setItem('oz_token', data.token);
             navigate('/');
         } catch (err) {
-            // Extrage întotdeauna un string din eroare
+            
             const msg =
-                err.response?.data?.error   // mesajul din obiectul { error: "..." }
-                ?? err.response?.data       // dacă e deja un string
+                err.response?.data?.error  
+                ?? err.response?.data       
                 ?? 'Eroare la autentificare';
             setError(msg);
         }

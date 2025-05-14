@@ -12,7 +12,7 @@ namespace OhmZone_ProiectLicenta.Controllers
         private readonly AppDbContext _ctx;
         public DevicesController(AppDbContext ctx) => _ctx = ctx;
 
-        // 1️⃣ GET /api/devices
+        
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,7 +22,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(devices);
         }
 
-        // 2️⃣ GET /api/devices/{id}
+       
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -31,11 +31,11 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(device);
         }
 
-        // 3️⃣ POST /api/devices
+       
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Device d)
         {
-            // Deduplicate by name
+            
             var existing = await _ctx.Devices
                                      .FirstOrDefaultAsync(x => x.Name == d.Name);
             if (existing != null)
@@ -44,7 +44,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             _ctx.Devices.Add(d);
             await _ctx.SaveChangesAsync();
 
-            // Correctly point at the GET by id action
+            
             return CreatedAtAction(
                 nameof(Get),
                 new { id = d.DeviceID },

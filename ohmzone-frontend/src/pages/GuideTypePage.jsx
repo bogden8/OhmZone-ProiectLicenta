@@ -1,12 +1,11 @@
-﻿// src/pages/GuideTypePage.jsx
-import React from 'react';
+﻿import React from 'react';
 import { useParams } from 'react-router-dom';
 
-// map each model → the guide-types you offer
+
 const guideTypesByModel = {
     'iPhone 14': ['Screen replacement', 'Battery swap', 'Camera repair'],
     'Galaxy S23': ['Screen replacement', 'Back cover change', 'Speaker fix'],
-    // …etc. for every model
+    
 };
 
 export default function GuideTypePage() {

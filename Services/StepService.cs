@@ -30,7 +30,7 @@ namespace OhmZone_ProiectLicenta.Services
 
         public async Task<Step> CreateAsync(int guideId, CreateStepDto dto)
         {
-            // 1) upload files to wwwroot/uploads
+            
             var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
             Directory.CreateDirectory(uploadsDir);
 
@@ -57,7 +57,7 @@ namespace OhmZone_ProiectLicenta.Services
                 }
             }
 
-            // 2) build entity
+            
             var step = new Step
             {
                 GuideID = guideId,
@@ -78,11 +78,6 @@ namespace OhmZone_ProiectLicenta.Services
             var step = await _context.Steps.FindAsync(stepId);
             if (step == null) return null;
 
-            // same upload logic if a new file was sent
-            // ...
-            // For brevity, you can mirror the CreateAsync upload steps
-
-            // update text
             step.Text = dto.Text ?? step.Text;
 
             await _context.SaveChangesAsync();

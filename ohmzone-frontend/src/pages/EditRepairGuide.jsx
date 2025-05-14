@@ -9,7 +9,7 @@ export default function EditRepairGuide() {
     const [form, setForm] = useState({
         title: '', url: '', difficulty: '', timeRequired: 0, contentJson: ''
     });
-    const [error, setError] = useState('');  // this line was fine
+    const [error, setError] = useState('');  
 
     useEffect(() => {
         fetchRepairGuideById(id).then(g => {
@@ -23,7 +23,7 @@ export default function EditRepairGuide() {
         });
     }, [id]);
 
-    // ← typo here: "cont" → "const"
+    
     const handleChange = e => {
         const { name, value } = e.target;
         setForm(f => ({
@@ -32,12 +32,12 @@ export default function EditRepairGuide() {
         }));
     };
 
-    // ← name typo: "handleSumbit" → "handleSubmit"
+    
     const handleSubmit = async e => {
         e.preventDefault();
         try {
             setError('');
-            // ← remove extra comma and fix "from" → "form"
+            
             await updateRepairGuide(id, {
                 title: form.title,
                 url: form.url,
@@ -53,10 +53,10 @@ export default function EditRepairGuide() {
 
     return (
         <div className="p-4">
-            {/* ← text-xl, not text-x1 */}
+           
             <h2 className="text-xl mb-4">Editează ghid #{id}</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>}
-            {/* ← form onSubmit must match handler name */}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     name="title" value={form.title} onChange={handleChange}
