@@ -11,7 +11,7 @@ namespace OhmZone_ProiectLicenta.Models
         public string Comment { get; set; }
         public DateTime DatePosted { get; set; }
 
-        public RepairGuides Guide { get; set; }
+        public RepairGuide Guide { get; set; }
         public Users User { get; set; }
     }
 }

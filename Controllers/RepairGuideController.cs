@@ -20,19 +20,25 @@ namespace OhmZone_ProiectLicenta.Controllers
         public async Task<IActionResult> GetAll() =>
             Ok(await _svc.GetAllGuidesAsync());
 
-        
+
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> Get(int id) =>
-            Ok(await _svc.GetGuideByIdAsync(id));
+        public async Task<IActionResult> Get(int id)
+        {
+            var guide = await _svc.GetGuideByIdAsync(id);
+            if (guide == null) return NotFound();
+            return Ok(guide);
+        }
 
-        
 
-        
-      
+
+
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRepairGuideDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var guide = await _svc.CreateAsync(dto);
             return CreatedAtAction(
                nameof(Get),

@@ -7,10 +7,10 @@ namespace OhmZone_ProiectLicenta.Services
 {
     public interface IRepairGuideService
     {
-        Task<IEnumerable<RepairGuides>> GetAllGuidesAsync();
-        Task<RepairGuides> GetGuideByIdAsync(int id);
-        Task<RepairGuides> CreateAsync(CreateRepairGuideDto dto);
-        Task<RepairGuides> UpdateAsync(int guideId, UpdateRepairGuideDto dto);
+        Task<IEnumerable<RepairGuide>> GetAllGuidesAsync();
+        Task<RepairGuide> GetGuideByIdAsync(int id);
+        Task<RepairGuide> CreateAsync(CreateRepairGuideDto dto);
+        Task<RepairGuide> UpdateAsync(int guideId, UpdateRepairGuideDto dto);
         Task<bool> DeleteAsync(int guideId);
     }
 }

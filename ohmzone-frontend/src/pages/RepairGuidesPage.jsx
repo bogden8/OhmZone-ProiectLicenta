@@ -49,7 +49,7 @@ export default function RepairGuidesPage() {
                 
                 {isAdmin && (
                     <Link
-                        to="/admin/guides/new"
+                        to="/admin/guides/full-create"
                         className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
                     >
                         Adaugă ghid

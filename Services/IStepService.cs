@@ -7,8 +7,10 @@ namespace OhmZone_ProiectLicenta.Services
 {
     public interface IStepService
     {
-        Task<IEnumerable<Step>> GetAllForGuideAsync(int guideId);
-        Task<Step> CreateAsync(int guideId, CreateStepDto dto);
-        Task<Step> UpdateAsync(int stepId, UpdateStepDto dto);
+        Task<IEnumerable<GuideStep>> GetAllForGuideAsync(int guideId);
+        Task<GuideStep> CreateAsync(int guideId, CreateStepDto dto);
+        Task<GuideStep> UpdateAsync(int stepId, UpdateStepDto dto);
+        Task<bool> DeleteAsync(int stepId); // Pentru ștergerea unui pas
+        Task<GuideStep> GetByIdAsync(int stepId); // Pentru editare din frontend (pre-umplere formular)
     }
 }

@@ -14,13 +14,16 @@ import { AddTutorialPage } from './pages/AddTutorialPage';
 import { AddProjectPage } from './pages/AddProjectPage';
 import EditRepairGuide from './pages/EditRepairGuide';
 import PrivateRoute from './components/PrivateRoute';
-import AddRepairGuidePage from './pages/AddRepairGuidePage';
 import ForumPage from './pages/ForumPage';
 import ForumAskPage from './pages/ForumAskPage';
 import ForumPostPage from './pages/ForumPostPage';
+import AddStepPage from './pages/AddStepPage';
+import ViewGuideStepsPage from './pages/ViewGuideStepsPage';
+import AddGuidePage from './pages/AddGuidePage';
 
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+
 
 function App() {
     return (
@@ -39,6 +42,7 @@ function App() {
                 <Route path="/forum" element={<ForumPage />} />
                 <Route path="/forum/ask" element={<ForumAskPage />} />
                 <Route path="/forum/post/:id" element={<ForumPostPage />} />
+                <Route path="/admin/guides/full-create" element={<AddGuidePage />} />
 
                 <Route path="/admin/guides/:id/edit" element={
                     <PrivateRoute allowedRoles={['Admin']}>
@@ -46,15 +50,20 @@ function App() {
                     </PrivateRoute>
                 } />
 
-                <Route
-                    path="/admin/guides/new"
-                    element={<AddRepairGuidePage />}
-                />
+                <Route path="/admin/guides/:guideId/steps/add" element={<AddStepPage />} />
+
+                <Route path="/admin/guides/:guideId/steps" element={
+                    <PrivateRoute allowedRoles={['Admin']}>
+                        <ViewGuideStepsPage />
+                    </PrivateRoute>
+                } />
 
                 
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>
+
+
 
             <Footer />
         </Router>

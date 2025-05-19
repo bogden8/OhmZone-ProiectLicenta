@@ -8,6 +8,6 @@ namespace OhmZone_ProiectLicenta.Models
         public int CategoryID { get; set; }
         public string CategoryName { get; set; }
 
-        public List<RepairGuides> RepairGuides { get; set; }
+        public List<RepairGuide> RepairGuides { get; set; }
     }
 }

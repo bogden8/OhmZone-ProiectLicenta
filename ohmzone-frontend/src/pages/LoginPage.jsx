@@ -1,8 +1,10 @@
 ﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
+    const { login } = useAuth();
     const [form, setForm] = useState({ usernameOrEmail: '', password: '' });
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -11,7 +13,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const { data } = await api.post('/auth/login', form);
-            localStorage.setItem('oz_token', data.token);
+            login(data.token); 
             navigate('/');
         } catch (err) {
             

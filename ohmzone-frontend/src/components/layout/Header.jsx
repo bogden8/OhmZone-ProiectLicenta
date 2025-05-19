@@ -1,26 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode'; 
+import { useAuth } from '../../context/AuthContext';
 
 export default function Header() {
-    const [user, setUser] = useState(null);
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const token = localStorage.getItem('oz_token');
-        if (token) {
-            try {
-                const { username } = jwtDecode(token);
-                setUser(username);
-            } catch {
-                localStorage.removeItem('oz_token');
-            }
-        }
-    }, []);
-
     const handleLogout = () => {
-        localStorage.removeItem('oz_token');
-        setUser(null);
+        logout();
         navigate('/login');
     };
 

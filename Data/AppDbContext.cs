@@ -21,7 +21,7 @@ namespace OhmZone_ProiectLicenta.Data
 
         
         public DbSet<Users> Users { get; set; }
-        public DbSet<RepairGuides> RepairGuides { get; set; }
+        public DbSet<RepairGuide> RepairGuides { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<GuideComments> GuideComments { get; set; }
         public DbSet<ForumPost> ForumThreads { get; set; } 
@@ -29,31 +29,31 @@ namespace OhmZone_ProiectLicenta.Data
         public DbSet<ForumCategories> ForumCategories { get; set; }
         public DbSet<RoboticsTutorials> RoboticsTutorials { get; set; }
         public DbSet<Device> Devices { get; set; }
-        public DbSet<Step> Steps { get; set; }
+        public DbSet<GuideStep> Steps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // ——— RepairGuides → Category ———
-            modelBuilder.Entity<RepairGuides>()
+            modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Category)
                 .WithMany(c => c.RepairGuides)
                 .HasForeignKey(rg => rg.CategoryID);
 
             // ——— RepairGuides → Author ———
-            modelBuilder.Entity<RepairGuides>()
+            modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Author)
                 .WithMany(u => u.RepairGuides)
                 .HasForeignKey(rg => rg.AuthorID);
 
             // ——— RepairGuides → Device ———
-            modelBuilder.Entity<RepairGuides>()
+            modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Device)
                 .WithMany()
-                .HasForeignKey(rg => rg.DeviceID)
+                .HasForeignKey(rg => rg.DeviceRepID)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ——— Step → RepairGuide ———
-            modelBuilder.Entity<Step>()
+            modelBuilder.Entity<GuideStep>()
                 .HasOne(s => s.Guide)
                 .WithMany(rg => rg.Steps)
                 .HasForeignKey(s => s.GuideID)

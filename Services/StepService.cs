@@ -8,6 +8,7 @@ using OhmZone_ProiectLicenta.Models;
 using System.Text.Json;
 using System.IO;
 using OhmZone_ProiectLicenta.Models.Dtos;
+using Microsoft.AspNetCore.Http;
 
 namespace OhmZone_ProiectLicenta.Services
 {
@@ -22,43 +23,26 @@ namespace OhmZone_ProiectLicenta.Services
             _env = env;
         }
 
-        public async Task<IEnumerable<Step>> GetAllForGuideAsync(int guideId) =>
+        public async Task<IEnumerable<GuideStep>> GetAllForGuideAsync(int guideId) =>
             await _context.Steps
                           .Where(s => s.GuideID == guideId)
                           .OrderBy(s => s.Order)
                           .ToListAsync();
 
-        public async Task<Step> CreateAsync(int guideId, CreateStepDto dto)
+        public async Task<GuideStep> CreateAsync(int guideId, CreateStepDto dto)
         {
-            
-            var uploadsDir = Path.Combine(_env.WebRootPath, "uploads");
-            Directory.CreateDirectory(uploadsDir);
-
             string mainUrl = null;
             if (dto.MainImage != null)
-            {
-                var fn = $"{Guid.NewGuid()}{Path.GetExtension(dto.MainImage.FileName)}";
-                var fp = Path.Combine(uploadsDir, fn);
-                using var fs = File.Create(fp);
-                await dto.MainImage.CopyToAsync(fs);
-                mainUrl = $"/uploads/{fn}";
-            }
+                mainUrl = await SaveImageAsync(dto.MainImage, "uploads");
 
             var thumbUrls = new List<string>();
             if (dto.Thumbnails != null)
             {
                 foreach (var file in dto.Thumbnails)
-                {
-                    var fn = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                    var fp = Path.Combine(uploadsDir, fn);
-                    using var fs = File.Create(fp);
-                    await file.CopyToAsync(fs);
-                    thumbUrls.Add($"/uploads/{fn}");
-                }
+                    thumbUrls.Add(await SaveImageAsync(file, "uploads"));
             }
 
-            
-            var step = new Step
+            var step = new GuideStep
             {
                 GuideID = guideId,
                 Text = dto.Text,
@@ -73,15 +57,57 @@ namespace OhmZone_ProiectLicenta.Services
             return step;
         }
 
-        public async Task<Step> UpdateAsync(int stepId, UpdateStepDto dto)
+        public async Task<GuideStep> UpdateAsync(int stepId, UpdateStepDto dto)
         {
             var step = await _context.Steps.FindAsync(stepId);
             if (step == null) return null;
 
             step.Text = dto.Text ?? step.Text;
 
+            if (dto.MainImage != null)
+                step.MainImageUrl = await SaveImageAsync(dto.MainImage, "uploads");
+
+            if (dto.Thumbnails != null && dto.Thumbnails.Any())
+            {
+                var thumbs = new List<string>();
+                foreach (var thumb in dto.Thumbnails)
+                    thumbs.Add(await SaveImageAsync(thumb, "uploads"));
+
+                step.ThumbnailUrlsJson = JsonSerializer.Serialize(thumbs);
+            }
+
             await _context.SaveChangesAsync();
             return step;
+        }
+
+        public async Task<GuideStep> GetByIdAsync(int stepId)
+        {
+            return await _context.Steps.FindAsync(stepId);
+        }
+
+        public async Task<bool> DeleteAsync(int stepId)
+        {
+            var step = await _context.Steps.FindAsync(stepId);
+            if (step == null) return false;
+
+            _context.Steps.Remove(step);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<string> SaveImageAsync(IFormFile file, string folder)
+        {
+            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var path = Path.Combine(_env.WebRootPath, folder, fileName);
+
+            Directory.CreateDirectory(Path.Combine(_env.WebRootPath, folder));
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return $"/{folder}/{fileName}";
         }
     }
 }
