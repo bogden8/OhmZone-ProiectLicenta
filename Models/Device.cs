@@ -7,10 +7,11 @@ namespace OhmZone_ProiectLicenta.Models
     {
         [Key]
         public int DeviceID { get; set; }
-        public string Brand { get; set; }
         public string Model { get; set; }
-        public string Category { get; set; }
-        public ICollection<RepairGuide> RepairGuides { get; set; }
+        public int BrandID { get; set; }
+        public string Slug { get; set; }
+        public Brand Brand { get; set; }
+        public List<RepairGuide> RepairGuides { get; set; }
     }
 
 }

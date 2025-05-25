@@ -19,47 +19,60 @@ namespace OhmZone_ProiectLicenta.Data
             }
         }
 
-        
         public DbSet<Users> Users { get; set; }
         public DbSet<RepairGuide> RepairGuides { get; set; }
-        public DbSet<Categories> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<GuideComments> GuideComments { get; set; }
-        public DbSet<ForumPost> ForumThreads { get; set; } 
+        public DbSet<ForumPost> ForumThreads { get; set; }
         public DbSet<ForumReplies> ForumReplies { get; set; }
-        public DbSet<ForumCategories> ForumCategories { get; set; }
         public DbSet<RoboticsTutorials> RoboticsTutorials { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<GuideStep> Steps { get; set; }
+        public DbSet<Subcategory> Subcategories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // ——— RepairGuides → Category ———
+            // ——— RepairGuide → Category ———
             modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Category)
                 .WithMany(c => c.RepairGuides)
                 .HasForeignKey(rg => rg.CategoryID);
 
-            // ——— RepairGuides → Author ———
+            // ——— RepairGuide → Author ———
             modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Author)
                 .WithMany(u => u.RepairGuides)
                 .HasForeignKey(rg => rg.AuthorID);
 
-            // ——— RepairGuides → Device ———
+            // ——— RepairGuide → Device ———
             modelBuilder.Entity<RepairGuide>()
                 .HasOne(rg => rg.Device)
-                .WithMany()
-                .HasForeignKey(rg => rg.DeviceRepID)
+                .WithMany(d => d.RepairGuides)
+                .HasForeignKey(rg => rg.DeviceID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // ——— Step → RepairGuide ———
+            // ——— GuideStep → RepairGuide ———
             modelBuilder.Entity<GuideStep>()
                 .HasOne(s => s.Guide)
                 .WithMany(rg => rg.Steps)
                 .HasForeignKey(s => s.GuideID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // ——— ForumPost (Thread) Relationships ———
+            // ——— GuideComments ———
+            modelBuilder.Entity<GuideComments>()
+                .HasOne(gc => gc.Guide)
+                .WithMany(rg => rg.GuideComments)
+                .HasForeignKey(gc => gc.GuideID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GuideComments>()
+                .HasOne(gc => gc.User)
+                .WithMany(u => u.GuideComments)
+                .HasForeignKey(gc => gc.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ——— ForumPost → ForumCategories ———
             modelBuilder.Entity<ForumPost>()
                 .HasOne(fp => fp.Category)
                 .WithMany(fc => fc.ForumThreads)
@@ -81,19 +94,6 @@ namespace OhmZone_ProiectLicenta.Data
                 .WithMany(u => u.ForumReplies)
                 .HasForeignKey(fr => fr.UserID);
 
-            // ——— GuideComments ———
-            modelBuilder.Entity<GuideComments>()
-                .HasOne(gc => gc.Guide)
-                .WithMany(rg => rg.GuideComments)
-                .HasForeignKey(gc => gc.GuideID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<GuideComments>()
-                .HasOne(gc => gc.User)
-                .WithMany(u => u.GuideComments)
-                .HasForeignKey(gc => gc.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // ——— RoboticsTutorials ———
             modelBuilder.Entity<RoboticsTutorials>()
                 .HasOne(rt => rt.Author)
@@ -108,6 +108,27 @@ namespace OhmZone_ProiectLicenta.Data
             modelBuilder.Entity<Users>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
+
+            // ——— Subcategory → Category ———
+            modelBuilder.Entity<Subcategory>()
+                .HasOne(sc => sc.Category)
+                .WithMany(c => c.Subcategories)
+                .HasForeignKey(sc => sc.CategoryID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ——— Brand → Subcategory ———
+            modelBuilder.Entity<Brand>()
+                .HasOne(b => b.Subcategory)
+                .WithMany(sc => sc.Brands)
+                .HasForeignKey(b => b.SubcategoryID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ——— Device → Brand ———
+            modelBuilder.Entity<Device>()
+                .HasOne(d => d.Brand)
+                .WithMany(b => b.Devices)
+                .HasForeignKey(d => d.BrandID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

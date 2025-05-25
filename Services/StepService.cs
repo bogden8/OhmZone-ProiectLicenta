@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
-using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using System.IO;
 using OhmZone_ProiectLicenta.Models.Dtos;
-using Microsoft.AspNetCore.Http;
 
 namespace OhmZone_ProiectLicenta.Services
 {
@@ -26,30 +25,21 @@ namespace OhmZone_ProiectLicenta.Services
         public async Task<IEnumerable<GuideStep>> GetAllForGuideAsync(int guideId) =>
             await _context.Steps
                           .Where(s => s.GuideID == guideId)
-                          .OrderBy(s => s.Order)
+                          .OrderBy(s => s.StepNumber)
                           .ToListAsync();
 
         public async Task<GuideStep> CreateAsync(int guideId, CreateStepDto dto)
         {
-            string mainUrl = null;
+            string imagePath = null;
             if (dto.MainImage != null)
-                mainUrl = await SaveImageAsync(dto.MainImage, "uploads");
-
-            var thumbUrls = new List<string>();
-            if (dto.Thumbnails != null)
-            {
-                foreach (var file in dto.Thumbnails)
-                    thumbUrls.Add(await SaveImageAsync(file, "uploads"));
-            }
+                imagePath = await SaveImageAsync(dto.MainImage, "uploads");
 
             var step = new GuideStep
             {
                 GuideID = guideId,
-                Text = dto.Text,
-                MainImageUrl = mainUrl,
-                ThumbnailUrlsJson = JsonSerializer.Serialize(thumbUrls),
-                Order = await _context.Steps.CountAsync(s => s.GuideID == guideId) + 1,
-                CreatedAt = DateTime.UtcNow
+                Description = dto.Description,
+                ImagePath = imagePath,
+                StepNumber = await _context.Steps.CountAsync(s => s.GuideID == guideId) + 1
             };
 
             _context.Steps.Add(step);
@@ -62,19 +52,11 @@ namespace OhmZone_ProiectLicenta.Services
             var step = await _context.Steps.FindAsync(stepId);
             if (step == null) return null;
 
-            step.Text = dto.Text ?? step.Text;
+            if (!string.IsNullOrEmpty(dto.Description))
+                step.Description = dto.Description;
 
             if (dto.MainImage != null)
-                step.MainImageUrl = await SaveImageAsync(dto.MainImage, "uploads");
-
-            if (dto.Thumbnails != null && dto.Thumbnails.Any())
-            {
-                var thumbs = new List<string>();
-                foreach (var thumb in dto.Thumbnails)
-                    thumbs.Add(await SaveImageAsync(thumb, "uploads"));
-
-                step.ThumbnailUrlsJson = JsonSerializer.Serialize(thumbs);
-            }
+                step.ImagePath = await SaveImageAsync(dto.MainImage, "uploads");
 
             await _context.SaveChangesAsync();
             return step;

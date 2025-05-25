@@ -1,47 +1,60 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 export default function ViewGuideStepsPage() {
     const { guideId } = useParams();
     const [steps, setSteps] = useState([]);
+    const [guide, setGuide] = useState(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        axios.get(`/api/repairguide/${guideId}/steps`)
-            .then(res => setSteps(res.data))
-            .catch(err => setError('Eroare la încărcarea pașilor.'));
+        async function fetchGuideData() {
+            try {
+                const guideRes = await axios.get(`/api/repairguide/${guideId}`);
+                setGuide(guideRes.data);
+
+                const stepsRes = await axios.get(`/api/repairguide/${guideId}/steps`);
+                setSteps(stepsRes.data);
+            } catch (err) {
+                setError('Eroare la încărcarea ghidului sau a pașilor.');
+            }
+        }
+
+        fetchGuideData();
     }, [guideId]);
 
     return (
-        <div className="max-w-4xl mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-6">Pași pentru ghidul #{guideId}</h1>
+        <div className="max-w-4xl mx-auto mt-10 p-4 bg-white rounded shadow">
             {error && <p className="text-red-500">{error}</p>}
-            <ul className="space-y-4">
+
+            {guide && (
+                <>
+                    <h1 className="text-3xl font-bold mb-6">{guide.title}</h1>
+                    <p className="text-gray-700 mb-6">{guide.content}</p>
+                </>
+            )}
+
+            <ul className="space-y-6">
                 {steps.map((step, index) => (
-                    <li key={step.id} className="border p-4 rounded bg-white shadow">
-                        <p className="font-semibold">Pasul {index + 1}</p>
-                        <p>{step.text}</p>
-                        {step.mainImageUrl && (
-                            <img src={step.mainImageUrl} alt="Main" className="w-64 mt-2 rounded" />
-                        )}
-                        {step.thumbnailUrlsJson && (
-                            <div className="flex gap-2 mt-2">
-                                {JSON.parse(step.thumbnailUrlsJson).map((url, i) => (
-                                    <img key={i} src={url} alt={`thumb-${i}`} className="w-20 h-20 object-cover rounded" />
-                                ))}
-                            </div>
+                    <li
+                        key={step.guideStepID || step.id || index}
+                        className="border p-4 rounded bg-gray-50 shadow"
+                    >
+                        <h2 className="text-xl font-semibold mb-2">Pasul {index + 1}</h2>
+                        <p className="mb-2">{step.description}</p>
+
+                        {step.imagePath && (
+                            <img
+                                src={`http://localhost:5097${step.imagePath}`}
+                                alt={`Pasul ${index + 1}`}
+                                className="w-full max-w-md rounded"
+                            />
+
                         )}
                     </li>
                 ))}
             </ul>
-
-            <Link
-                to={`/admin/guides/${guideId}/steps/add`}
-                className="mt-6 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-                Adaugă un pas nou
-            </Link>
         </div>
     );
 }

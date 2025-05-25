@@ -2,12 +2,16 @@
 
 namespace OhmZone_ProiectLicenta.Models
 {
-    public class ForumCategories
+    public class Category
     {
         [Key]
         public int CategoryID { get; set; }
+        [Required]
         public string CategoryName { get; set; }
-
+        public string? Slug { get; set; }
+        public List<Subcategory> Subcategories { get; set; }
+        public List<RepairGuide> RepairGuides { get; set; }
         public List<ForumPost> ForumThreads { get; set; }
+
     }
 }

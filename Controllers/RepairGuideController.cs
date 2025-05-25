@@ -66,5 +66,55 @@ namespace OhmZone_ProiectLicenta.Controllers
             if (!deleted) return NotFound();
             return NoContent();
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("full")]
+        public async Task<IActionResult> CreateFullGuide(
+    [FromForm] string title,
+    [FromForm] string categoryIdStr,
+    [FromForm] string? newBrandName,
+    [FromForm] string? deviceIdStr,
+    [FromForm] string? newDeviceName,
+    [FromForm] string? part,
+    [FromForm] string? content,
+    [FromForm] string authorID, // 🔁 schimbat din int în string
+    [FromForm] List<string> stepTexts,
+    [FromForm] List<IFormFile> stepImages)
+        {
+            if (!int.TryParse(authorID, out int parsedAuthorId))
+                return BadRequest("AuthorID invalid");
+
+            var guide = await _svc.CreateFullGuideAsync(
+                title, categoryIdStr, newBrandName, deviceIdStr, newDeviceName,
+                part, content, stepTexts, stepImages, parsedAuthorId);
+
+            return Ok(new
+            {
+                guideID = guide.GuideID,
+                nextUrl = $"/admin/guides/{guide.GuideID}/steps"
+            });
+        }
+
+        [HttpGet("{id}/steps")]
+        public async Task<IActionResult> GetGuideSteps(int id)
+        {
+            var guide = await _svc.GetGuideByIdAsync(id);
+            if (guide == null)
+                return NotFound("Ghidul nu a fost găsit.");
+
+            var stepDtos = guide.Steps.Select(s => new GuideStepDto
+            {
+                GuideStepID = s.GuideStepID,
+                Description = s.Description,
+                ImagePath = s.ImagePath
+            });
+
+            return Ok(stepDtos);
+        }
+
+
+
+
+
+
     }
 }

@@ -8,15 +8,13 @@ namespace OhmZone_ProiectLicenta.Models
     {
         [Key]
         public int GuideStepID { get; set; }
-
-        public int RepairGuideID { get; set; } 
-        public RepairGuide RepairGuide { get; set; }
+        public int GuideID { get; set; }
+        public RepairGuide Guide { get; set; }
 
         public int StepNumber { get; set; }
-
-        
         public string Description { get; set; }
-        public string ImagePath { get; set; }
+        public string? ImagePath { get; set; }
     }
+
 
 }

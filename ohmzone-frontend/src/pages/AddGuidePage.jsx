@@ -1,14 +1,23 @@
 ﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 export default function AddGuidePage() {
     const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
     const [deviceList, setDeviceList] = useState([]);
+    const [brandList, setBrandList] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
+
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [newDeviceName, setNewDeviceName] = useState('');
+
+    const [selectedBrandId, setSelectedBrandId] = useState('');
+    const [newBrandName, setNewBrandName] = useState('');
+
+    const [selectedCategoryId, setSelectedCategoryId] = useState('');
     const [steps, setSteps] = useState([{ text: '', image: null }]);
     const [error, setError] = useState('');
 
@@ -16,6 +25,14 @@ export default function AddGuidePage() {
         axios.get('/api/device')
             .then(res => setDeviceList(res.data))
             .catch(() => setDeviceList([]));
+
+        axios.get('/api/lookup/categories')
+            .then(res => setCategoryList(res.data))
+            .catch(() => setCategoryList([]));
+
+        axios.get('/api/lookup/brands')
+            .then(res => setBrandList(res.data))
+            .catch(() => setBrandList([]));
     }, []);
 
     const handleStepChange = (index, field, value) => {
@@ -32,27 +49,72 @@ export default function AddGuidePage() {
         e.preventDefault();
         setError('');
 
-        const formData = new FormData();
-        formData.append('Title', title);
-        formData.append('DeviceID', selectedDeviceId);
-        formData.append('NewDeviceName', newDeviceName);
+        const token = localStorage.getItem('oz_token');
+        if (!token) {
+            setError('Nu ești autentificat.');
+            return;
+        }
 
-        steps.forEach((step, index) => {
-            formData.append(`Steps[${index}].Text`, step.text);
-            if (step.image) {
-                formData.append(`Steps[${index}].Image`, step.image);
-            }
+        let decoded;
+        try {
+            decoded = jwtDecode(token);
+        } catch (err) {
+            setError('Token JWT invalid.');
+            return;
+        }
+
+        const authorID = decoded.sub || decoded.userId || decoded.id;
+        if (!authorID) {
+            setError('Nu s-a putut extrage ID-ul utilizatorului.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('authorID', authorID);
+        formData.append('title', title);
+        formData.append('part', 'N/A');
+        formData.append('content', 'Conținut ghid');
+
+        if (selectedCategoryId) {
+            formData.append('categoryIdStr', selectedCategoryId);
+        } else {
+            setError('Selectează o categorie.');
+            return;
+        }
+
+        if (selectedDeviceId) {
+            formData.append('deviceIdStr', selectedDeviceId);
+        } else if (newDeviceName) {
+            formData.append('newDeviceName', newDeviceName);
+            if (selectedBrandId) formData.append('brandId', selectedBrandId);
+            if (newBrandName) formData.append('newBrandName', newBrandName);
+        } else {
+            setError('Selectează un device existent sau adaugă unul nou.');
+            return;
+        }
+
+        steps.forEach(step => {
+            formData.append('stepTexts', step.text);
+            if (step.image) formData.append('stepImages', step.image);
         });
 
         try {
             const res = await axios.post('/api/repairguide/full', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
-            navigate(res.data.nextUrl);
+            if (res.data?.nextUrl) {
+                navigate(res.data.nextUrl);
+            } else {
+                navigate('/repair-guides');
+            }
+
         } catch (err) {
             console.error(err);
-            setError('Eroare la salvare. Verifică câmpurile.');
+            setError(err.response?.data?.error || 'Eroare la salvare. Verifică câmpurile sau backendul.');
         }
     };
 
@@ -64,38 +126,40 @@ export default function AddGuidePage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block font-semibold">Titlu ghid</label>
-                    <input
-                        type="text"
-                        className="w-full border p-2 rounded"
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
-                        required
-                    />
+                    <input type="text" className="w-full border p-2 rounded" value={title} onChange={e => setTitle(e.target.value)} required />
+                </div>
+
+                <div>
+                    <label className="block font-semibold">Categorie</label>
+                    <select className="w-full border p-2 rounded" value={selectedCategoryId} onChange={e => setSelectedCategoryId(e.target.value)} required>
+                        <option value="">-- Selectează --</option>
+                        {categoryList.map(c => (
+                            <option key={c.categoryID} value={c.categoryID}>{c.categoryName}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <div>
                     <label className="block font-semibold">Alege un device existent</label>
-                    <select
-                        className="w-full border p-2 rounded"
-                        value={selectedDeviceId}
-                        onChange={e => setSelectedDeviceId(e.target.value)}
-                    >
+                    <select className="w-full border p-2 rounded" value={selectedDeviceId} onChange={e => setSelectedDeviceId(e.target.value)}>
                         <option value="">-- Selectează --</option>
                         {deviceList.map(d => (
-                            <option key={d.id} value={d.id}>{d.brand} {d.model}</option>
+                            <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>
                         ))}
                     </select>
                 </div>
 
                 <div>
                     <label className="block font-semibold">sau adaugă un device nou</label>
-                    <input
-                        type="text"
-                        className="w-full border p-2 rounded"
-                        placeholder="Ex: iPhone 11"
-                        value={newDeviceName}
-                        onChange={e => setNewDeviceName(e.target.value)}
-                    />
+                    <input type="text" className="w-full border p-2 rounded mb-2" placeholder="Ex: iPhone 11" value={newDeviceName} onChange={e => setNewDeviceName(e.target.value)} />
+                    <label className="block font-semibold">Brand</label>
+                    <select className="w-full border p-2 rounded mb-2" value={selectedBrandId} onChange={e => setSelectedBrandId(e.target.value)}>
+                        <option value="">-- Selectează brand --</option>
+                        {brandList.map(b => (
+                            <option key={b.brandID} value={b.brandID}>{b.name}</option>
+                        ))}
+                    </select>
+                    <input type="text" className="w-full border p-2 rounded" placeholder="sau adaugă brand nou" value={newBrandName} onChange={e => setNewBrandName(e.target.value)} />
                 </div>
 
                 <hr className="my-4" />
@@ -104,35 +168,17 @@ export default function AddGuidePage() {
                 {steps.map((step, idx) => (
                     <div key={idx} className="border p-4 mb-4 rounded bg-gray-50">
                         <label className="block mb-1 font-semibold">Descriere pas #{idx + 1}</label>
-                        <textarea
-                            rows={3}
-                            className="w-full border p-2 rounded mb-2"
-                            value={step.text}
-                            onChange={e => handleStepChange(idx, 'text', e.target.value)}
-                            required
-                        />
-
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={e => handleStepChange(idx, 'image', e.target.files[0])}
-                        />
+                        <textarea rows={3} className="w-full border p-2 rounded mb-2" value={step.text} onChange={e => handleStepChange(idx, 'text', e.target.value)} required />
+                        <input type="file" accept="image/*" onChange={e => handleStepChange(idx, 'image', e.target.files[0])} />
                     </div>
                 ))}
 
-                <button
-                    type="button"
-                    onClick={addNewStep}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                >
+                <button type="button" onClick={addNewStep} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                     + Adaugă alt pas
                 </button>
 
                 <div className="pt-6">
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                    >
+                    <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
                         Salvează ghidul
                     </button>
                 </div>

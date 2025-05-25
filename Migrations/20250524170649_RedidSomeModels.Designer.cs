@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OhmZone_ProiectLicenta.Data;
 
@@ -11,9 +12,11 @@ using OhmZone_ProiectLicenta.Data;
 namespace OhmZone_ProiectLicenta.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250524170649_RedidSomeModels")]
+    partial class RedidSomeModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,10 +83,6 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("SubcategoryID")
                         .HasColumnType("int");
 
@@ -106,9 +105,6 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("CategoryID");
 
                     b.ToTable("Categories");
@@ -129,15 +125,28 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("DeviceID");
 
                     b.HasIndex("BrandID");
 
                     b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumCategories", b =>
+                {
+                    b.Property<int>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryID"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryID");
+
+                    b.ToTable("ForumCategories");
                 });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumReplies", b =>
@@ -219,6 +228,7 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StepNumber")
@@ -331,11 +341,7 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
+                    b.Property<string>("Nmae")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -392,7 +398,7 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OhmZone_ProiectLicenta.Models.Category", "Category")
+                    b.HasOne("OhmZone_ProiectLicenta.Models.ForumCategories", "Category")
                         .WithMany("ForumThreads")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -535,8 +541,6 @@ namespace OhmZone_ProiectLicenta.Migrations
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.Category", b =>
                 {
-                    b.Navigation("ForumThreads");
-
                     b.Navigation("RepairGuides");
 
                     b.Navigation("Subcategories");
@@ -545,6 +549,11 @@ namespace OhmZone_ProiectLicenta.Migrations
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.Device", b =>
                 {
                     b.Navigation("RepairGuides");
+                });
+
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumCategories", b =>
+                {
+                    b.Navigation("ForumThreads");
                 });
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.RepairGuide", b =>

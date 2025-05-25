@@ -17,15 +17,18 @@ namespace OhmZone_ProiectLicenta.Services
         private readonly AppDbContext _context;
         private readonly ILogger<RepairGuideService> _logger;
         private readonly IWebHostEnvironment _env;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public RepairGuideService(
             AppDbContext context,
             ILogger<RepairGuideService> logger,
-            IWebHostEnvironment env)
+            IWebHostEnvironment env,
+            IHttpContextAccessor httpContextAccessor)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _env = env ?? throw new ArgumentNullException(nameof(env));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<RepairGuide> CreateAsync(CreateRepairGuideDto dto)
@@ -35,7 +38,7 @@ namespace OhmZone_ProiectLicenta.Services
                 Title = dto.Title,
                 CategoryID = dto.CategoryID,
                 AuthorID = dto.AuthorID,
-                DeviceRepID = dto.DeviceID,
+                DeviceID = dto.DeviceID,
                 Part = dto.Part,
                 Content = dto.Content,
                 Rating = 0f,
@@ -71,6 +74,7 @@ namespace OhmZone_ProiectLicenta.Services
                     .Include(g => g.Category)
                     .Include(g => g.Author)
                     .Include(g => g.GuideComments)
+                    .Include(g => g.Steps)
                     .FirstOrDefaultAsync(g => g.GuideID == id);
             }
             catch (Exception ex)
@@ -120,66 +124,93 @@ namespace OhmZone_ProiectLicenta.Services
         }
 
         public async Task<RepairGuide> CreateFullGuideAsync(
-            string title,
-            string? deviceIdStr,
-            string? newDeviceName,
-            string? part,
-            string? content,
-            List<string> stepTexts,
-            List<IFormFile> stepImages)
+           string title,
+           string categoryIdStr,
+           string? newBrandName,
+           string? deviceIdStr,
+           string? newDeviceName,
+           string? part,
+           string? content,
+           List<string> stepTexts,
+           List<IFormFile> stepImages,
+           int authorID)
         {
-            // Identificare sau creare device
+            Console.WriteLine("Saving guide with AuthorID: " + authorID);
+
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(categoryIdStr) || stepTexts.Count == 0)
+                throw new ArgumentException("Missing required fields");
+
+            int? categoryId = null;
+            int? brandId = null;
             int? deviceId = null;
-            if (!string.IsNullOrEmpty(deviceIdStr) && int.TryParse(deviceIdStr, out int parsedId))
+
+            if (!string.IsNullOrEmpty(categoryIdStr) && int.TryParse(categoryIdStr, out int catId))
+                categoryId = catId;
+
+            if (!string.IsNullOrEmpty(deviceIdStr) && int.TryParse(deviceIdStr, out int parsedDeviceId))
             {
-                deviceId = parsedId;
+                deviceId = parsedDeviceId;
             }
             else if (!string.IsNullOrWhiteSpace(newDeviceName))
             {
-                var device = new Device { Brand = "Generic", Model = newDeviceName };
-                _context.Devices.Add(device);
+                if (!string.IsNullOrWhiteSpace(newBrandName))
+                {
+                    var existingBrand = await _context.Brands.FirstOrDefaultAsync(b => b.Name == newBrandName);
+                    if (existingBrand == null)
+                    {
+                        existingBrand = new Brand { Name = newBrandName };
+                        _context.Brands.Add(existingBrand);
+                        await _context.SaveChangesAsync();
+                    }
+                    brandId = existingBrand.BrandID;
+                }
+
+                var newDevice = new Device
+                {
+                    Model = newDeviceName,
+                    BrandID = brandId ?? throw new Exception("Brand required for new device")
+                };
+
+                _context.Devices.Add(newDevice);
                 await _context.SaveChangesAsync();
-                deviceId = device.DeviceID;
+                deviceId = newDevice.DeviceID;
             }
 
-            if (deviceId == null)
-                throw new Exception("Device invalid.");
+            if (deviceId == null || categoryId == null)
+                throw new Exception("Invalid device or category");
 
-            // Creează ghidul principal
             var guide = new RepairGuide
             {
                 Title = title,
-                DeviceRepID = deviceId.Value,
+                CategoryID = categoryId.Value,
+                DeviceID = deviceId.Value,
                 Part = part,
                 Content = content,
                 Rating = 0f,
                 DatePublished = DateTime.UtcNow,
-                GuideSteps = new List<GuideStep>()
+                AuthorID = authorID,
+                Steps = new List<GuideStep>()
             };
 
-            // Folder salvare imagini
-            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads", "guidesteps");
+            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads", "guidestepsphotos");
             if (!Directory.Exists(uploadsPath))
                 Directory.CreateDirectory(uploadsPath);
 
-            // Adaugă fiecare pas
             for (int i = 0; i < stepTexts.Count; i++)
             {
-                string imagePath = null;
-
+                string? imagePath = null;
                 if (i < stepImages.Count && stepImages[i] != null)
                 {
                     var img = stepImages[i];
                     var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(img.FileName)}";
                     var filePath = Path.Combine(uploadsPath, fileName);
                     using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
                         await img.CopyToAsync(stream);
-                    }
-                    imagePath = $"/uploads/guidesteps/{fileName}";
+                    imagePath = $"/uploads/guidestepsphotos/{fileName}";
+
                 }
 
-                guide.GuideSteps.Add(new GuideStep
+                guide.Steps.Add(new GuideStep
                 {
                     StepNumber = i + 1,
                     Description = stepTexts[i],

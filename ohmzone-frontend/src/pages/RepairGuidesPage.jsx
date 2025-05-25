@@ -1,52 +1,42 @@
-﻿import React from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import * as jwt from "jwt-decode"; 
-
-const categories = [
-    { name: "PC Laptop", slug: "pc-laptop" },
-    { name: "Game consoles", slug: "game-consoles" },
-    { name: "Phone", slug: "phone" },
-    { name: "Mac", slug: "mac" },
-    { name: "Power tools", slug: "power-tools" },
-];
+import axios from "axios";
 
 export default function RepairGuidesPage() {
+    const [categories, setCategories] = useState([]);
+    const [error, setError] = useState("");
+
     const token = localStorage.getItem("oz_token");
     let isAdmin = false;
 
     if (token) {
         try {
-            
             const parts = token.split(".");
             if (parts.length === 3) {
-                
                 const payloadJson = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
                 const payload = JSON.parse(payloadJson);
-                console.log("JWT payload:", payload);
-
-                
                 const roleClaim =
                     payload.role ||
                     payload.Role ||
                     (Array.isArray(payload.roles) ? payload.roles[0] : undefined) ||
                     payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-
-                console.log("Detected roleClaim:", roleClaim);
                 isAdmin = roleClaim === "Admin";
             }
         } catch (e) {
-            console.error("Error decoding JWT:", e);
+            console.error("JWT decode error:", e);
         }
     }
+
+    useEffect(() => {
+        axios.get("/api/lookup/categories")
+            .then(res => setCategories(res.data))
+            .catch(() => setError("Eroare la încărcarea categoriilor."));
+    }, []);
 
     return (
         <div className="bg-white">
             <div className="flex items-center justify-between max-w-5xl mx-auto px-4 pt-6">
-                <h1 className="text-4xl font-bold font-jersey">
-                    Repair guides
-                </h1>
-
-                
+                <h1 className="text-4xl font-bold font-jersey">Repair Guides</h1>
                 {isAdmin && (
                     <Link
                         to="/admin/guides/full-create"
@@ -57,7 +47,6 @@ export default function RepairGuidesPage() {
                 )}
             </div>
 
-           
             <div className="w-full mt-4">
                 <img
                     src="/assets/repair-banner.jpg"
@@ -66,27 +55,23 @@ export default function RepairGuidesPage() {
                 />
             </div>
 
-            
-            <h2 className="text-center text-xl font-bold mt-10 mb-6">Category</h2>
+            <h2 className="text-center text-xl font-bold mt-10 mb-6">Categorie</h2>
 
-           
+            {error && <p className="text-center text-red-500">{error}</p>}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-4">
                 {categories.map(cat => (
                     <Link
-                        key={cat.slug}
-                        to={
-                            cat.slug === "phone"
-                                ? "/repair-guides/phone"
-                                : `/guides/${encodeURIComponent(cat.slug)}`
-                        }
+                        key={cat.categoryID}
+                        to={`/repair-guides/${encodeURIComponent(cat.slug || cat.categoryName.toLowerCase().replace(/\s+/g, '-'))}`}
                         className="bg-gray-300 hover:bg-gray-400 transition cursor-pointer text-center p-8 font-bold text-lg rounded"
                     >
-                        {cat.name}
+                        {cat.categoryName}
                     </Link>
+
                 ))}
             </div>
 
-            
             <div className="bg-gray-300 mt-16 py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8 rounded">
                 <p className="text-black font-bold text-sm max-w-md">
                     Importanța dreptului de a repara

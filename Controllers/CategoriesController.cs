@@ -25,7 +25,7 @@ namespace OhmZone_ProiectLicenta.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Categories c)
+        public async Task<IActionResult> Create([FromBody] Category c)
         {
             
             var existing = await _ctx.Categories

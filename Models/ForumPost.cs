@@ -10,7 +10,7 @@ public class ForumPost
 
     public int CategoryID { get; set; }
     [ForeignKey("CategoryID")]
-    public ForumCategories Category { get; set; }
+    public Category Category { get; set; }
 
     public int AuthorID { get; set; }
     [ForeignKey("AuthorID")]

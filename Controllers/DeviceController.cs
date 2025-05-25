@@ -48,7 +48,7 @@ namespace OhmZone_ProiectLicenta.Controllers
 
             return CreatedAtAction(
                 nameof(Get),
-                new { id = d.Id }, // 🔁 folosește Id
+                new { id = d.DeviceID }, // 🔁 folosește Id
                 d
             );
         }

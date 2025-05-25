@@ -6,7 +6,7 @@ import Footer from './components/layout/Footer';
 
 import HomePage from './pages/HomePage';
 import RepairGuidesPage from './pages/RepairGuidesPage';
-import PhoneTypeSelectionPage from './pages/PhoneTypePage';
+import SubcategoryPage from './pages/SubcategorySelectionPage';
 import ModelSelectionPage from './pages/ModelSelectionPage';
 import GuideTypePage from './pages/GuideTypePage';
 import RoboticsPage from './pages/RoboticsPage';
@@ -20,10 +20,9 @@ import ForumPostPage from './pages/ForumPostPage';
 import AddStepPage from './pages/AddStepPage';
 import ViewGuideStepsPage from './pages/ViewGuideStepsPage';
 import AddGuidePage from './pages/AddGuidePage';
-
+import BrandSelectionPage from './pages/BrandSelectionPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
-
 
 function App() {
     return (
@@ -32,38 +31,43 @@ function App() {
 
             <Routes>
                 <Route path="/" element={<HomePage />} />
+
+                {/* Repair Guides Flow */}
                 <Route path="/repair-guides" element={<RepairGuidesPage />} />
-                <Route path="/repair-guides/phone" element={<PhoneTypeSelectionPage />} />
-                <Route path="/repair-guides/phone/:phoneType" element={<ModelSelectionPage />} />
-                <Route path="/repair-guides/phone/:phoneType/:model" element={<GuideTypePage />} />
+                <Route path="/repair-guides/:categorySlug" element={<SubcategoryPage />} />
+                <Route path="/repair-guides/:categorySlug/:subcategorySlug" element={<BrandSelectionPage />} />
+                <Route path="/repair-guides/:categorySlug/:subcategorySlug/:brandSlug" element={<ModelSelectionPage />} />
+                <Route path="/repair-guides/:categorySlug/:subcategorySlug/:brandSlug/:deviceSlug" element={<GuideTypePage />} />
+                <Route path="/guides/view/:guideId" element={<ViewGuideStepsPage />} />
+
+                {/* Robotics */}
                 <Route path="/robotics" element={<RoboticsPage />} />
                 <Route path="/robotics/new-tutorial" element={<AddTutorialPage />} />
                 <Route path="/robotics/new-project" element={<AddProjectPage />} />
+
+                {/* Forum */}
                 <Route path="/forum" element={<ForumPage />} />
                 <Route path="/forum/ask" element={<ForumAskPage />} />
                 <Route path="/forum/post/:id" element={<ForumPostPage />} />
-                <Route path="/admin/guides/full-create" element={<AddGuidePage />} />
 
+                {/* Admin */}
+                <Route path="/admin/guides/full-create" element={<AddGuidePage />} />
                 <Route path="/admin/guides/:id/edit" element={
                     <PrivateRoute allowedRoles={['Admin']}>
                         <EditRepairGuide />
                     </PrivateRoute>
                 } />
-
                 <Route path="/admin/guides/:guideId/steps/add" element={<AddStepPage />} />
-
                 <Route path="/admin/guides/:guideId/steps" element={
                     <PrivateRoute allowedRoles={['Admin']}>
                         <ViewGuideStepsPage />
                     </PrivateRoute>
                 } />
 
-                
+                {/* Auth */}
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>
-
-
 
             <Footer />
         </Router>

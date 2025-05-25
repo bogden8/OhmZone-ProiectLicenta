@@ -13,10 +13,16 @@ using OhmZone_ProiectLicenta.Models;
 using OhmZone_ProiectLicenta.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHttpContextAccessor();
 
 // ——— Configure Entity Framework & SQL Server ———
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 
 // ——— CORS policy for your React frontend ———
 builder.Services.AddCors(options =>
@@ -124,7 +130,7 @@ using (var scope = app.Services.CreateScope())
 
     if (!ctx.Categories.Any())
     {
-        ctx.Categories.Add(new Categories
+        ctx.Categories.Add(new Category
         {
             CategoryName = "General"
         });
