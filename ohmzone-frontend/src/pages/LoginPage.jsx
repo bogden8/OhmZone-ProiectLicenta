@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { jwtDecode } from 'jwt-decode';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -13,13 +14,17 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const { data } = await api.post('/auth/login', form);
-            login(data.token); 
+            const decoded = jwtDecode(data.token);
+
+            localStorage.setItem('oz_token', data.token);
+            localStorage.setItem('oz_role', decoded.role); 
+
+            login(data.token);
             navigate('/');
         } catch (err) {
-            
             const msg =
-                err.response?.data?.error  
-                ?? err.response?.data       
+                err.response?.data?.error
+                ?? err.response?.data
                 ?? 'Eroare la autentificare';
             setError(msg);
         }

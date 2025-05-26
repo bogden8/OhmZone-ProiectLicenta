@@ -1,13 +1,14 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
 
 export default function ForumPostPage() {
     const { id } = useParams();
     const [post, setPost] = useState(null);
     const [newComment, setNewComment] = useState('');
-    const [userID] = useState(1); 
     const [refresh, setRefresh] = useState(false);
+    const { user } = useAuth();
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/forum-posts/${id}`)
@@ -19,32 +20,48 @@ export default function ForumPostPage() {
     }, [id, refresh]);
 
     const handleAddComment = async () => {
-        if (!newComment.trim()) return;
+        if (!newComment.trim() || !user) {
+            alert("Trebuie să fii autentificat pentru a comenta.");
+            return;
+        }
+        const token = localStorage.getItem('oz_token');
+        console.log("Token folosit:", token);
+        if (!token) {
+            alert("Nu ești logat. Fă login și încearcă din nou.");
+            return;
+        }
 
         const response = await fetch(`${API_BASE_URL}/api/forum-threads/${id}/replies`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('oz_token')}`
             },
             body: JSON.stringify({
-                content: newComment,
-                userID: userID
+                content: newComment
             })
         });
 
         if (response.ok) {
             setNewComment('');
             setRefresh(prev => !prev);
+        } else {
+            alert('Eroare la trimiterea comentariului.');
         }
     };
 
     const handleDeleteComment = async (replyID) => {
         const response = await fetch(`${API_BASE_URL}/api/forum-threads/${id}/replies/${replyID}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('oz_token')}`
+            }
         });
 
         if (response.ok) {
             setRefresh(prev => !prev);
+        } else {
+            alert('Nu ai voie să ștergi acest comentariu.');
         }
     };
 
@@ -81,7 +98,7 @@ export default function ForumPostPage() {
                                 {reply.user?.username || "Anonim"} – {new Date(reply.datePosted).toLocaleString()}
                             </p>
                             <p>{reply.content}</p>
-                            {reply.userID === userID && (
+                            {user?.id === reply.userID && (
                                 <button
                                     onClick={() => handleDeleteComment(reply.replyID)}
                                     className="absolute top-2 right-2 text-red-500 hover:underline text-sm"

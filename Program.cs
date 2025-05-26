@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +8,10 @@ using Microsoft.OpenApi.Models;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
 using OhmZone_ProiectLicenta.Services;
+using System;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
@@ -88,6 +89,20 @@ builder.Services.AddAuthentication(options =>
 {
     opts.RequireHttpsMetadata = false;
     opts.SaveToken = true;
+
+    opts.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+            {
+                context.Token = authHeader.Substring("Bearer ".Length).Trim();
+            }
+            return Task.CompletedTask;
+        }
+    };
+
     opts.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -97,9 +112,15 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSection["Issuer"],
         ValidAudience = jwtSection["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+
+        // 🟢 Aici era problema: fără asta, backendul nu găsește `nameid`
+        NameClaimType = "nameid",
+        RoleClaimType = ClaimTypes.Role
     };
 });
+
+
 
 builder.Services.AddAuthorization();
 

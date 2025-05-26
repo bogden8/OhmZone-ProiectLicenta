@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
@@ -19,10 +21,24 @@ namespace OhmZone_ProiectLicenta.Controllers
             _env = env;
         }
 
-        
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromForm] CreateForumPostDto dto)
+
         {
+            Console.WriteLine("✔ Autentificat: " + User.Identity?.IsAuthenticated);
+            Console.WriteLine("✔ CLAIMURI:");
+            foreach (var claim in User.Claims)
+            {
+                Console.WriteLine($"  {claim.Type} => {claim.Value}");
+            }
+
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine("✔ userIdStr extras: " + userIdStr);
+
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized();
+
             string? imagePath = null;
 
             if (dto.Image != null)
@@ -46,7 +62,7 @@ namespace OhmZone_ProiectLicenta.Controllers
             {
                 Title = dto.Title,
                 CategoryID = dto.CategoryID,
-                AuthorID = dto.AuthorID,
+                AuthorID = userId, // 🔁 Folosim userul din JWT
                 Content = dto.Content,
                 DatePosted = DateTime.UtcNow,
                 Type = dto.Type,
@@ -61,7 +77,9 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(thread);
         }
 
-        
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

@@ -1,6 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from "../config";
+import { getCurrentUser } from '../utils/getCurrentUser';
+
 export default function AskQuestionPage() {
     const [title, setTitle] = useState('');
     const [type, setType] = useState('');
@@ -11,19 +13,37 @@ export default function AskQuestionPage() {
 
     const [categories, setCategories] = useState([]);
     const [categoryID, setCategoryID] = useState('');
-    const [authorID, setAuthorID] = useState(1); 
+    const [currentUser, setCurrentUser] = useState(null);
 
     const navigate = useNavigate();
 
-    
     useEffect(() => {
-        fetch('http://localhost:5097/api/categories')
-            .then(res => res.json())
-            .then(data => setCategories(data));
-    }, []);
+        const user = getCurrentUser();
+
+        if (!user) {
+            alert("Trebuie să fii autentificat pentru a posta.");
+            navigate('/login');
+            return;
+        }
+
+        setCurrentUser(user);
+
+        fetch(`${API_BASE_URL}/api/categories`)
+            .then(res => {
+                if (!res.ok) throw new Error('Eroare la încărcarea categoriilor');
+                return res.json();
+            })
+            .then(data => setCategories(data))
+            .catch(err => {
+                console.error("Eroare la categorii:", err.message);
+            });
+    }, [navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const token = localStorage.getItem('oz_token');
+        console.log("Token trimis:", token);
 
         const formData = new FormData();
         formData.append('Title', title);
@@ -31,23 +51,29 @@ export default function AskQuestionPage() {
         formData.append('Type', type);
         formData.append('About', about);
         formData.append('Device', device);
-        formData.append('AuthorID', authorID);
         formData.append('CategoryID', categoryID);
         if (image) formData.append('Image', image);
 
-        const response = await fetch('http://localhost:5097/api/forum-posts', {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/forum-posts`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
+            });
 
-        if (response.ok) {
-            navigate('/forum');
-        } else {
-            const errorText = await response.text(); 
-            console.error('Eroare server:', errorText); 
-            alert('Eroare la trimiterea întrebării');
+            if (response.ok) {
+                navigate('/forum');
+            } else {
+                const errorText = await response.text();
+                console.error('Eroare server:', errorText);
+                alert('Eroare la trimiterea întrebării');
+            }
+        } catch (err) {
+            console.error("Eroare la fetch:", err);
+            alert("A apărut o eroare la trimiterea întrebării.");
         }
-
     };
 
     return (

@@ -17,9 +17,7 @@ public class AuthService : IAuthService
     private readonly IConfiguration _config;
     private readonly IPasswordHasher<Users> _hasher;
 
-    public AuthService(AppDbContext ctx,
-                       IConfiguration config,
-                       IPasswordHasher<Users> hasher)
+    public AuthService(AppDbContext ctx, IConfiguration config, IPasswordHasher<Users> hasher)
     {
         _ctx = ctx;
         _config = config;
@@ -49,40 +47,35 @@ public class AuthService : IAuthService
 
     public async Task<string> LoginAsync(string usernameOrEmail, string password)
     {
-        
-        var user = await _ctx.Users.FirstOrDefaultAsync(u =>
-            u.Email == usernameOrEmail ||
-            u.Username == usernameOrEmail);
+        var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Email == usernameOrEmail || u.Username == usernameOrEmail);
 
-        
-        if (user == null)
-            throw new ApplicationException("Utilizator inexistent");
+        if (user == null || _hasher.VerifyHashedPassword(user, user.PasswordHash, password) != PasswordVerificationResult.Success)
+            throw new ApplicationException("Date de autentificare invalide");
 
-        
-        var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-        if (result == PasswordVerificationResult.Failed)
-            throw new ApplicationException("Parolă incorectă");
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
 
-        
         var claims = new List<Claim>
+{
+    new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+    new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+    new Claim("nameid", user.UserID.ToString()), // 🔥 ESENȚIAL pentru backend
+    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+    new Claim(ClaimTypes.Name, user.Username),
+    new Claim(ClaimTypes.Role, user.Role ?? "User")
+};
+
+
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            new Claim(JwtRegisteredClaimNames.Sub,  user.UserID.ToString()),
-            new Claim(ClaimTypes.Name,              user.Username),
-            new Claim(ClaimTypes.Role,              user.Role),
-            new Claim("username",                   user.Username)
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(3),
+            Issuer = _config["Jwt:Issuer"],
+            Audience = _config["Jwt:Audience"],
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
 }

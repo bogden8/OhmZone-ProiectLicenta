@@ -10,10 +10,26 @@ export default function ViewGuideStepsPage() {
     const [guide, setGuide] = useState(null);
     const [error, setError] = useState('');
 
-    
-    const role = localStorage.getItem('oz_role') || '';
-    const isAdmin = role.toLowerCase() === 'admin';
+    // Extragem rolul direct din token JWT
+    const token = localStorage.getItem('oz_token');
+    let isAdmin = false;
 
+    if (token) {
+        try {
+            const parts = token.split('.');
+            if (parts.length === 3) {
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                const roleClaim =
+                    payload.role ||
+                    payload.Role ||
+                    (Array.isArray(payload.roles) ? payload.roles[0] : undefined) ||
+                    payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+                isAdmin = roleClaim === 'Admin';
+            }
+        } catch (e) {
+            console.error('JWT decode error:', e);
+        }
+    }
 
     useEffect(() => {
         async function fetchGuideData() {
@@ -32,18 +48,18 @@ export default function ViewGuideStepsPage() {
     }, [guideId]);
 
     const handleDelete = async () => {
-        if (!window.confirm("Ești sigur că vrei să ștergi acest ghid?")) return;
+        if (!window.confirm('Ești sigur că vrei să ștergi acest ghid?')) return;
 
         try {
             await axios.delete(`/api/repairguide/${guideId}`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('oz_token')}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
             navigate('/repair-guides');
         } catch (err) {
-            console.error("Eroare la ștergere:", err);
-            setError("Nu s-a putut șterge ghidul.");
+            console.error('Eroare la ștergere:', err);
+            setError('Nu s-a putut șterge ghidul.');
         }
     };
 
