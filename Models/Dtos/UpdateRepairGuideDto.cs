@@ -5,7 +5,7 @@
         public string Title { get; set; }
         public int CategoryID { get; set; }
         public string Content { get; set; }
-        public int DeviceID { get; set; } // ✅ corect pentru modelul curent
+        public int DeviceID { get; set; } 
         public string Part { get; set; }
     }
 }

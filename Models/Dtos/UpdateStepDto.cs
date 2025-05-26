@@ -5,7 +5,7 @@ namespace OhmZone_ProiectLicenta.Models.Dtos
 {
     public class UpdateStepDto
     {
-        public string Description { get; set; } // ✅ în loc de Text
-        public IFormFile MainImage { get; set; } // ✅ folosit ca ImagePath
+        public string Description { get; set; } 
+        public IFormFile? MainImage { get; set; } 
     }
 }

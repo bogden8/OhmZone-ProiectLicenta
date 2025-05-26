@@ -12,7 +12,6 @@ import GuideTypePage from './pages/GuideTypePage';
 import RoboticsPage from './pages/RoboticsPage';
 import { AddTutorialPage } from './pages/AddTutorialPage';
 import { AddProjectPage } from './pages/AddProjectPage';
-import EditRepairGuide from './pages/EditRepairGuide';
 import PrivateRoute from './components/PrivateRoute';
 import ForumPage from './pages/ForumPage';
 import ForumAskPage from './pages/ForumAskPage';
@@ -23,6 +22,7 @@ import AddGuidePage from './pages/AddGuidePage';
 import BrandSelectionPage from './pages/BrandSelectionPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import EditGuidePage from './pages/EditGuidePage';
 
 function App() {
     return (
@@ -30,9 +30,10 @@ function App() {
             <Header />
 
             <Routes>
+                {/* Public Pages */}
                 <Route path="/" element={<HomePage />} />
 
-                {/* Repair Guides Flow */}
+                {/* Repair Guides */}
                 <Route path="/repair-guides" element={<RepairGuidesPage />} />
                 <Route path="/repair-guides/:categorySlug" element={<SubcategoryPage />} />
                 <Route path="/repair-guides/:categorySlug/:subcategorySlug" element={<BrandSelectionPage />} />
@@ -50,13 +51,9 @@ function App() {
                 <Route path="/forum/ask" element={<ForumAskPage />} />
                 <Route path="/forum/post/:id" element={<ForumPostPage />} />
 
-                {/* Admin */}
+                {/* Admin Only */}
                 <Route path="/admin/guides/full-create" element={<AddGuidePage />} />
-                <Route path="/admin/guides/:id/edit" element={
-                    <PrivateRoute allowedRoles={['Admin']}>
-                        <EditRepairGuide />
-                    </PrivateRoute>
-                } />
+                <Route path="/admin/guides/:id/edit" element={<EditGuidePage />} />
                 <Route path="/admin/guides/:guideId/steps/add" element={<AddStepPage />} />
                 <Route path="/admin/guides/:guideId/steps" element={
                     <PrivateRoute allowedRoles={['Admin']}>
@@ -64,7 +61,7 @@ function App() {
                     </PrivateRoute>
                 } />
 
-                {/* Auth */}
+                {/* Authentication */}
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/login" element={<LoginPage />} />
             </Routes>
