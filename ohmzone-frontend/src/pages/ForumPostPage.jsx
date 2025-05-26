@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 
@@ -9,6 +9,7 @@ export default function ForumPostPage() {
     const [newComment, setNewComment] = useState('');
     const [refresh, setRefresh] = useState(false);
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/forum-posts/${id}`)
@@ -41,8 +42,6 @@ export default function ForumPostPage() {
             if (response.ok) {
                 setNewComment('');
                 setRefresh(prev => !prev);
-            } else if (response.status === 401) {
-                alert('Trebuie să fii logat cu un token valid.');
             } else {
                 const errorText = await response.text();
                 console.error('Eroare server:', errorText);
@@ -72,7 +71,31 @@ export default function ForumPostPage() {
         }
     };
 
+    const handleDeletePost = async () => {
+        const token = localStorage.getItem('oz_token');
+        if (!token) return;
+
+        const confirmDelete = window.confirm("Sigur vrei să ștergi această postare?");
+        if (!confirmDelete) return;
+
+        const response = await fetch(`${API_BASE_URL}/api/forum-posts/${id}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            setRefresh(prev => !prev);
+        } else {
+            alert("Nu ai permisiunea să ștergi această postare.");
+        }
+    };
+
     if (!post) return <p className="p-10">Se încarcă postarea...</p>;
+
+    const isDeleted = post.title === "[Postare ștearsă de autor]";
+    const isAuthor = user && post.authorID && parseInt(user.id) === parseInt(post.authorID);
 
     return (
         <div className="max-w-[900px] mx-auto px-4 py-10">
@@ -80,6 +103,15 @@ export default function ForumPostPage() {
             <p className="text-sm text-gray-600 mb-4">
                 Postat de <strong>{post.author?.username || 'Anonim'}</strong> pe {new Date(post.datePosted).toLocaleString()}
             </p>
+
+            {isAuthor && !isDeleted && (
+                <button
+                    onClick={handleDeletePost}
+                    className="text-red-500 font-bold mb-4 hover:underline"
+                >
+                    Șterge postarea
+                </button>
+            )}
 
             {post.imageUrl && (
                 <img
@@ -89,7 +121,11 @@ export default function ForumPostPage() {
                 />
             )}
 
-            <p className="mb-8 whitespace-pre-wrap">{post.content}</p>
+            {isDeleted ? (
+                <p className="italic text-gray-500 mb-8">Postarea originală a fost ștearsă de autor. Comentariile rămân afișate mai jos.</p>
+            ) : (
+                <p className="mb-8 whitespace-pre-wrap">{post.content}</p>
+            )}
 
             <hr className="my-6" />
 
@@ -99,40 +135,46 @@ export default function ForumPostPage() {
                 <p className="text-gray-500 mb-4">Nimeni nu a comentat încă.</p>
             ) : (
                 <div className="space-y-4 mb-6">
-                    {post.forumReplies.map(reply => (
-                        <div key={reply.replyID} className="bg-gray-100 p-4 rounded relative">
-                            <p className="text-sm text-gray-600 mb-1">
-                                {reply.user?.username || "Anonim"} – {new Date(reply.datePosted).toLocaleString()}
-                            </p>
-                            <p>{reply.content}</p>
-                            {user?.id === reply.userID && (
-                                <button
-                                    onClick={() => handleDeleteComment(reply.replyID)}
-                                    className="absolute top-2 right-2 text-red-500 hover:underline text-sm"
-                                >
-                                    Șterge
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                    {post.forumReplies.map(reply => {
+                        const isCommentAuthor = user && reply.userID && parseInt(user.id) === parseInt(reply.userID);
+
+                        return (
+                            <div key={reply.replyID} className="bg-gray-100 p-4 rounded relative">
+                                <p className="text-sm text-gray-600 mb-1">
+                                    {reply.user?.username || "Anonim"} – {new Date(reply.datePosted).toLocaleString()}
+                                </p>
+                                <p>{reply.content}</p>
+                                {isCommentAuthor && (
+                                    <button
+                                        onClick={() => handleDeleteComment(reply.replyID)}
+                                        className="absolute top-2 right-2 text-red-500 hover:underline text-sm"
+                                    >
+                                        Șterge
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 
-            <div className="mt-6">
-                <textarea
-                    rows={3}
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    className="w-full border rounded px-4 py-2 mb-2"
-                    placeholder="Adaugă un comentariu..."
-                />
-                <button
-                    onClick={handleAddComment}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Trimite comentariul
-                </button>
-            </div>
+            {!isDeleted && (
+                <div className="mt-6">
+                    <textarea
+                        rows={3}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        className="w-full border rounded px-4 py-2 mb-2"
+                        placeholder="Adaugă un comentariu..."
+                    />
+                    <button
+                        onClick={handleAddComment}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
+                        Trimite comentariul
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

@@ -63,7 +63,6 @@ namespace OhmZone_ProiectLicenta.Controllers
         [HttpDelete("{replyId}")]
         public async Task<IActionResult> DeleteReply(int threadId, int replyId)
         {
-            // 🔧 extrage userID din ClaimTypes.NameIdentifier
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdStr, out int userId))
                 return Unauthorized();
@@ -73,12 +72,14 @@ namespace OhmZone_ProiectLicenta.Controllers
                 return NotFound();
 
             if (reply.UserID != userId)
-                return Forbid();
+                return Forbid(); // aici ai primit 403
 
             _context.ForumReplies.Remove(reply);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+
     }
 }

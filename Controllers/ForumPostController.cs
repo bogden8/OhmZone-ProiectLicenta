@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
 using OhmZone_ProiectLicenta.Models.Dtos;
+using System.Security.Claims;
 
 namespace OhmZone_ProiectLicenta.Controllers
 {
@@ -106,44 +107,73 @@ namespace OhmZone_ProiectLicenta.Controllers
             return Ok(posts);
         }
 
-        
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var post = await _context.ForumThreads
-                .Where(t => t.ThreadID == id)
-                .Select(t => new
-                {
-                    t.ThreadID,
-                    t.Title,
-                    t.Content,
-                    t.ImageUrl,
-                    t.Type,
-                    t.About,
-                    t.Device,
-                    t.DatePosted,
-                    Author = new
-                    {
-                        t.Author.Username
-                    },
-                    ForumReplies = t.ForumReplies.Select(r => new
-                    {
-                        r.ReplyID,
-                        r.Content,
-                        r.DatePosted,
-                        r.UserID,
-                        User = new
-                        {
-                            r.User.Username
-                        }
-                    })
-                })
-                .FirstOrDefaultAsync();
+                .Include(t => t.Author)
+                .Include(t => t.ForumReplies)
+                    .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(t => t.ThreadID == id);
 
             if (post == null)
                 return NotFound();
 
-            return Ok(post);
+            return Ok(new
+            {
+                post.ThreadID,
+                post.Title,
+                post.Content,
+                post.ImageUrl,
+                post.Type,
+                post.About,
+                post.Device,
+                post.DatePosted,
+
+                AuthorID = post.AuthorID, // 🔥 asta lipsește acum
+                Author = new
+                {
+                    Username = post.Author?.Username
+                },
+
+                ForumReplies = post.ForumReplies.Select(r => new
+                {
+                    r.ReplyID,
+                    r.Content,
+                    r.DatePosted,
+                    r.UserID, // 🔥 verifică că apare și acesta
+                    User = new
+                    {
+                        Username = r.User?.Username
+                    }
+                }).ToList()
+            });
         }
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized();
+
+            var post = await _context.ForumThreads.FindAsync(id);
+            if (post == null)
+                return NotFound();
+
+            if (post.AuthorID != userId)
+                return Forbid();
+
+            // ștergere logică
+            post.Title = "[Postare ștearsă de autor]";
+            post.Content = "Această postare a fost ștearsă de utilizator.";
+            post.ImageUrl = null;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
     }
 }
