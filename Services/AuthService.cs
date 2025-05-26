@@ -56,15 +56,22 @@ public class AuthService : IAuthService
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
 
         var claims = new List<Claim>
-{
-    new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
-    new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-    new Claim("nameid", user.UserID.ToString()), // 🔥 ESENȚIAL pentru backend
-    new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-    new Claim(ClaimTypes.Name, user.Username),
-    new Claim(ClaimTypes.Role, user.Role ?? "User")
-};
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()), // ✅ corect
+        new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Role, user.Role ?? "User")
+    };
 
+        // ✅ AICI facem debug log-ul după ce lista există
+        Console.WriteLine("🧠 AuthService - token creat pentru: " + user.Username);
+
+        Console.WriteLine("🔒 Claims generate:");
+        foreach (var claim in claims)
+        {
+            Console.WriteLine($"{claim.Type} => {claim.Value}");
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -78,4 +85,5 @@ public class AuthService : IAuthService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
 }

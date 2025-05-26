@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OhmZone_ProiectLicenta.Data;
 using OhmZone_ProiectLicenta.Models;
 using OhmZone_ProiectLicenta.Models.Dtos;
+using System.Security.Claims;
 
 namespace OhmZone_ProiectLicenta.Controllers
 {
@@ -23,7 +24,8 @@ namespace OhmZone_ProiectLicenta.Controllers
         [HttpPost]
         public async Task<IActionResult> AddReply(int threadId, [FromBody] AddReplyDto dto)
         {
-            var userIdStr = User.FindFirst("nameid")?.Value;
+            // 🔧 extrage userID din ClaimTypes.NameIdentifier
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdStr, out int userId))
                 return Unauthorized();
 
@@ -61,7 +63,8 @@ namespace OhmZone_ProiectLicenta.Controllers
         [HttpDelete("{replyId}")]
         public async Task<IActionResult> DeleteReply(int threadId, int replyId)
         {
-            var userIdStr = User.FindFirst("nameid")?.Value;
+            // 🔧 extrage userID din ClaimTypes.NameIdentifier
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdStr, out int userId))
                 return Unauthorized();
 

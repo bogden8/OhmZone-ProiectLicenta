@@ -20,41 +20,48 @@ export default function ForumPostPage() {
     }, [id, refresh]);
 
     const handleAddComment = async () => {
-        if (!newComment.trim() || !user) {
-            alert("Trebuie să fii autentificat pentru a comenta.");
-            return;
-        }
+        if (!newComment.trim()) return;
+
         const token = localStorage.getItem('oz_token');
-        console.log("Token folosit:", token);
         if (!token) {
             alert("Nu ești logat. Fă login și încearcă din nou.");
             return;
         }
 
-        const response = await fetch(`${API_BASE_URL}/api/forum-threads/${id}/replies`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('oz_token')}`
-            },
-            body: JSON.stringify({
-                content: newComment
-            })
-        });
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/forum-threads/${id}/replies`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ content: newComment })
+            });
 
-        if (response.ok) {
-            setNewComment('');
-            setRefresh(prev => !prev);
-        } else {
-            alert('Eroare la trimiterea comentariului.');
+            if (response.ok) {
+                setNewComment('');
+                setRefresh(prev => !prev);
+            } else if (response.status === 401) {
+                alert('Trebuie să fii logat cu un token valid.');
+            } else {
+                const errorText = await response.text();
+                console.error('Eroare server:', errorText);
+                alert('Eroare la trimiterea comentariului.');
+            }
+        } catch (err) {
+            console.error("Eroare la fetch:", err);
+            alert("A apărut o eroare la rețea.");
         }
     };
 
     const handleDeleteComment = async (replyID) => {
+        const token = localStorage.getItem('oz_token');
+        if (!token) return;
+
         const response = await fetch(`${API_BASE_URL}/api/forum-threads/${id}/replies/${replyID}`, {
             method: 'DELETE',
             headers: {
-                Authorization: `Bearer ${localStorage.getItem('oz_token')}`
+                Authorization: `Bearer ${token}`
             }
         });
 

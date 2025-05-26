@@ -22,19 +22,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 // ——— CORS policy for your React frontend ———
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "https://localhost:3000"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod());
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
 });
 
 // ——— Swagger/OpenAPI ———
@@ -68,15 +65,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 // ——— Application services ———
 builder.Services.AddScoped<IStepService, StepService>();
 builder.Services.AddScoped<IRepairGuideService, RepairGuideService>();
-
-// ——— Authentication & Authorization ———
 builder.Services.AddScoped<IPasswordHasher<Users>, PasswordHasher<Users>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// ——— JWT Config ———
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = Encoding.UTF8.GetBytes(jwtSection["Key"]);
 
@@ -114,22 +109,18 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
         ClockSkew = TimeSpan.Zero,
 
-        // 🟢 Aici era problema: fără asta, backendul nu găsește `nameid`
-        NameClaimType = "nameid",
+        // ✅ CORECT
+        NameClaimType = ClaimTypes.NameIdentifier,
         RoleClaimType = ClaimTypes.Role
     };
 });
 
-
-
 builder.Services.AddAuthorization();
-
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// ——— Seed Admin ———
+// ——— Seed Admin + Default Category ———
 using (var scope = app.Services.CreateScope())
 {
     var ctx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
