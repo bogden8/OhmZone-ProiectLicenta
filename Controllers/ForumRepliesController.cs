@@ -72,7 +72,7 @@ namespace OhmZone_ProiectLicenta.Controllers
                 return NotFound();
 
             if (reply.UserID != userId)
-                return Forbid(); // aici ai primit 403
+                return Forbid(); 
 
             _context.ForumReplies.Remove(reply);
             await _context.SaveChangesAsync();

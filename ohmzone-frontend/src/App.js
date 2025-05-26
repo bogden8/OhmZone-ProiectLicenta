@@ -23,7 +23,8 @@ import BrandSelectionPage from './pages/BrandSelectionPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import EditGuidePage from './pages/EditGuidePage';
-
+import RoboticsTutorialPage from './pages/RoboticsTutorialPage';
+import EditTutorialPage from './pages/EditTutorialPage';
 function App() {
     return (
         <Router>
@@ -45,7 +46,8 @@ function App() {
                 <Route path="/robotics" element={<RoboticsPage />} />
                 <Route path="/robotics/new-tutorial" element={<AddTutorialPage />} />
                 <Route path="/robotics/new-project" element={<AddProjectPage />} />
-
+                <Route path="/robotics/:id" element={<RoboticsTutorialPage />} />
+                <Route path="/robotics/edit/:id" element={<EditTutorialPage />} />
                 {/* Forum */}
                 <Route path="/forum" element={<ForumPage />} />
                 <Route path="/forum/ask" element={<ForumAskPage />} />
