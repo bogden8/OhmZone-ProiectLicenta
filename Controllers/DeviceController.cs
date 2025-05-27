@@ -52,5 +52,29 @@ namespace OhmZone_ProiectLicenta.Controllers
                 d
             );
         }
+
+        [HttpGet("with-details")]
+        public async Task<IActionResult> GetDevicesWithDetails()
+        {
+            var devices = await _ctx.Devices
+                .Include(d => d.Brand)
+                    .ThenInclude(b => b.Subcategory)
+                        .ThenInclude(sc => sc.Category)
+                .Select(d => new {
+                    d.DeviceID,
+                    d.Model,
+                    d.Slug,
+                    BrandName = d.Brand.Name,
+                    SubcategoryName = d.Brand.Subcategory.Name,
+                    CategoryName = d.Brand.Subcategory.Category.CategoryName,
+                    CategoryID = d.Brand.Subcategory.Category.CategoryID // ⬅ ADĂUGAT
+                })
+                .OrderBy(d => d.Model)
+                .ToListAsync();
+
+            return Ok(devices);
+        }
+
+
     }
 }

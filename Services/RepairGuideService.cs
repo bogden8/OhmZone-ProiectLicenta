@@ -124,16 +124,17 @@ namespace OhmZone_ProiectLicenta.Services
         }
 
         public async Task<RepairGuide> CreateFullGuideAsync(
-           string title,
-           string categoryIdStr,
-           string? newBrandName,
-           string? deviceIdStr,
-           string? newDeviceName,
-           string? part,
-           string? content,
-           List<string> stepTexts,
-           List<IFormFile> stepImages,
-           int authorID)
+            string title,
+            string categoryIdStr,
+            string? brandIdStr,
+            string? newBrandName,
+            string? deviceIdStr,
+            string? newDeviceName,
+            string? part,
+            string? content,
+            List<string> stepTexts,
+            List<IFormFile> stepImages,
+            int authorID)
         {
             Console.WriteLine("Saving guide with AuthorID: " + authorID);
 
@@ -153,7 +154,11 @@ namespace OhmZone_ProiectLicenta.Services
             }
             else if (!string.IsNullOrWhiteSpace(newDeviceName))
             {
-                if (!string.IsNullOrWhiteSpace(newBrandName))
+                if (!string.IsNullOrWhiteSpace(brandIdStr) && int.TryParse(brandIdStr, out int parsedBrandId))
+                {
+                    brandId = parsedBrandId;
+                }
+                else if (!string.IsNullOrWhiteSpace(newBrandName))
                 {
                     var existingBrand = await _context.Brands.FirstOrDefaultAsync(b => b.Name == newBrandName);
                     if (existingBrand == null)
@@ -165,10 +170,14 @@ namespace OhmZone_ProiectLicenta.Services
                     brandId = existingBrand.BrandID;
                 }
 
+                if (brandId == null)
+                    throw new Exception("Brand required for new device");
+
                 var newDevice = new Device
                 {
                     Model = newDeviceName,
-                    BrandID = brandId ?? throw new Exception("Brand required for new device")
+                    BrandID = brandId.Value,
+                    Slug = GenerateSlug(newDeviceName)
                 };
 
                 _context.Devices.Add(newDevice);
@@ -207,7 +216,6 @@ namespace OhmZone_ProiectLicenta.Services
                     using (var stream = new FileStream(filePath, FileMode.Create))
                         await img.CopyToAsync(stream);
                     imagePath = $"/uploads/guidestepsphotos/{fileName}";
-
                 }
 
                 guide.Steps.Add(new GuideStep
@@ -222,6 +230,23 @@ namespace OhmZone_ProiectLicenta.Services
             await _context.SaveChangesAsync();
 
             return guide;
+        }
+
+        // 🔧 Funcție utilitară pentru generare slug
+        private string GenerateSlug(string input)
+        {
+            return input
+                .Trim()
+                .ToLower()
+                .Replace("ă", "a")
+                .Replace("â", "a")
+                .Replace("î", "i")
+                .Replace("ș", "s")
+                .Replace("ț", "t")
+                .Replace(" ", "-")
+                .Replace(".", "")
+                .Replace(",", "")
+                .Replace("/", "-");
         }
     }
 }

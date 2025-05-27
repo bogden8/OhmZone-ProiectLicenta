@@ -1,25 +1,47 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Header() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef();
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
+    const handleSearchKey = (e) => {
+        if (e.key === 'Enter' && searchTerm.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+        }
+    };
+
+    // Închide dropdown-ul dacă dai click în afara lui
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return (
-        <header className="sticky top-0 z-50 bg-navbar-bg text-white py-3 shadow-md">
+        <header className="sticky top-0 z-50 bg-navbar-bg text-white py-3 shadow-md transition duration-300">
             <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
                 <div className="flex items-center gap-12">
-                    <Link to="/" className="text-5xl font-bold font-jersey">OhmZone</Link>
+                    <Link to="/" className="text-5xl font-bold font-jersey hover:text-yellow-400 transition">
+                        OhmZone
+                    </Link>
                     <nav className="flex items-center gap-8 font-bold text-sm">
-                        <Link to="/repair-guides">Fix your stuff</Link>
-                        <Link to="/robotics">Robotics</Link>
-                        <Link to="/forum">Forum</Link>
+                        <Link to="/repair-guides" className="hover:text-yellow-400 transition">Fix your stuff</Link>
+                        <Link to="/robotics" className="hover:text-yellow-400 transition">Robotics</Link>
+                        <Link to="/forum" className="hover:text-yellow-400 transition">Forum</Link>
                     </nav>
                 </div>
 
@@ -27,21 +49,36 @@ export default function Header() {
                     <input
                         type="text"
                         placeholder="search"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        onKeyDown={handleSearchKey}
                         className="bg-gray-300 text-black px-6 py-2 rounded-full w-64 placeholder-black"
                     />
                     <button className="bg-gray-300 text-black rounded-md px-3 py-1 font-bold text-sm">RO</button>
 
                     {user ? (
-                        <>
-                            <span className="font-medium">{user.username}</span>
-                            <button onClick={handleLogout} className="text-sm font-bold hover:underline">
-                                Logout
-                            </button>
-                        </>
+                        <div className="relative" ref={dropdownRef}>
+                            <span
+                                onClick={() => setIsOpen(prev => !prev)}
+                                className="font-medium cursor-pointer hover:text-yellow-400 transition"
+                            >
+                                {user.username}
+                            </span>
+                            {isOpen && (
+                                <div className="absolute right-0 mt-2 w-32 bg-white text-black rounded shadow-lg z-50">
+                                    <button
+                                        onClick={handleLogout}
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-200 transition"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <>
-                            <Link to="/login" className="text-sm font-bold">Login</Link>
-                            <Link to="/register" className="text-sm font-bold">Register</Link>
+                            <Link to="/login" className="text-sm font-bold hover:text-yellow-400 transition">Login</Link>
+                            <Link to="/register" className="text-sm font-bold hover:text-yellow-400 transition">Register</Link>
                         </>
                     )}
                 </div>

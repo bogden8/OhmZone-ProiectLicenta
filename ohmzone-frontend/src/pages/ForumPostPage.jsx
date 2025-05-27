@@ -11,6 +11,9 @@ export default function ForumPostPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
+    const role = localStorage.getItem('oz_role') || '';
+    const isAdmin = role.toLowerCase() === 'admin';
+
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/forum-posts/${id}`)
             .then(res => res.json())
@@ -71,11 +74,11 @@ export default function ForumPostPage() {
         }
     };
 
-    const handleDeletePost = async () => {
+    const handleSoftDeletePost = async () => {
         const token = localStorage.getItem('oz_token');
         if (!token) return;
 
-        const confirmDelete = window.confirm("Sigur vrei să ștergi această postare?");
+        const confirmDelete = window.confirm("Aceasta va șterge titlul și conținutul, dar comentariile vor rămâne. Sigur?");
         if (!confirmDelete) return;
 
         const response = await fetch(`${API_BASE_URL}/api/forum-posts/${id}`, {
@@ -88,7 +91,28 @@ export default function ForumPostPage() {
         if (response.ok) {
             setRefresh(prev => !prev);
         } else {
-            alert("Nu ai permisiunea să ștergi această postare.");
+            alert("Nu ai permisiunea să faci ștergerea logică.");
+        }
+    };
+
+    const handleHardDeletePost = async () => {
+        const token = localStorage.getItem('oz_token');
+        if (!token) return;
+
+        const confirmDelete = window.confirm("Aceasta va șterge complet postarea și o va elimina din baza de date. Sigur?");
+        if (!confirmDelete) return;
+
+        const response = await fetch(`${API_BASE_URL}/api/forum-posts/${id}?hard=true`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            navigate('/forum');
+        } else {
+            alert("Nu ai permisiunea să ștergi complet această postare.");
         }
     };
 
@@ -104,14 +128,25 @@ export default function ForumPostPage() {
                 Postat de <strong>{post.author?.username || 'Anonim'}</strong> pe {new Date(post.datePosted).toLocaleString()}
             </p>
 
-            {isAuthor && !isDeleted && (
-                <button
-                    onClick={handleDeletePost}
-                    className="text-red-500 font-bold mb-4 hover:underline"
-                >
-                    Șterge postarea
-                </button>
-            )}
+            <div className="mb-4 space-x-4">
+                {(isAuthor || (isAdmin && !isDeleted)) && (
+                    <button
+                        onClick={handleSoftDeletePost}
+                        className="text-yellow-600 font-semibold hover:underline"
+                    >
+                        Șterge postarea (logic)
+                    </button>
+                )}
+                {isAdmin && (
+                    <button
+                        onClick={handleHardDeletePost}
+                        className="text-red-600 font-bold hover:underline"
+                    >
+                        Șterge complet postarea (din DB)
+                    </button>
+                )}
+            </div>
+
 
             {post.imageUrl && (
                 <img

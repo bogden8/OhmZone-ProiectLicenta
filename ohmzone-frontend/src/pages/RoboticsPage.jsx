@@ -46,7 +46,7 @@ export default function RoboticsPage() {
                 {isAdmin && (
                     <button
                         onClick={handleAdd}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-4 py-2 rounded"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                     >
                         Adaugă un tutorial
                     </button>

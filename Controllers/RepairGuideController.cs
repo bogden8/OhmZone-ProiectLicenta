@@ -71,21 +71,23 @@ namespace OhmZone_ProiectLicenta.Controllers
         public async Task<IActionResult> CreateFullGuide(
     [FromForm] string title,
     [FromForm] string categoryIdStr,
+    [FromForm] string? brandIdStr,         // 🔧 NOU
     [FromForm] string? newBrandName,
     [FromForm] string? deviceIdStr,
     [FromForm] string? newDeviceName,
     [FromForm] string? part,
     [FromForm] string? content,
-    [FromForm] string authorID, // 🔁 schimbat din int în string
+    [FromForm] string authorID,
     [FromForm] List<string> stepTexts,
     [FromForm] List<IFormFile> stepImages)
         {
             if (!int.TryParse(authorID, out int parsedAuthorId))
                 return BadRequest("AuthorID invalid");
 
+            // 🔧 Transmite și brandIdStr în serviciu
             var guide = await _svc.CreateFullGuideAsync(
-                title, categoryIdStr, newBrandName, deviceIdStr, newDeviceName,
-                part, content, stepTexts, stepImages, parsedAuthorId);
+                title, categoryIdStr, brandIdStr, newBrandName, deviceIdStr,
+                newDeviceName, part, content, stepTexts, stepImages, parsedAuthorId);
 
             return Ok(new
             {
@@ -93,6 +95,7 @@ namespace OhmZone_ProiectLicenta.Controllers
                 nextUrl = $"/admin/guides/{guide.GuideID}/steps"
             });
         }
+
 
         [HttpGet("{id}/steps")]
         public async Task<IActionResult> GetGuideSteps(int id)

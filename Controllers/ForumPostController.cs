@@ -152,9 +152,11 @@ namespace OhmZone_ProiectLicenta.Controllers
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePost(int id)
+        public async Task<IActionResult> DeletePost(int id, [FromQuery] bool hard = false)
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             if (!int.TryParse(userIdStr, out int userId))
                 return Unauthorized();
 
@@ -162,10 +164,19 @@ namespace OhmZone_ProiectLicenta.Controllers
             if (post == null)
                 return NotFound();
 
-            if (post.AuthorID != userId)
+            if (hard)
+            {
+                if (userRole != "Admin")
+                    return Forbid();
+
+                _context.ForumThreads.Remove(post);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+
+            if (post.AuthorID != userId && userRole != "Admin")
                 return Forbid();
 
-            // ștergere logică
             post.Title = "[Postare ștearsă de autor]";
             post.Content = "Această postare a fost ștearsă de utilizator.";
             post.ImageUrl = null;
@@ -173,6 +184,9 @@ namespace OhmZone_ProiectLicenta.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
+
 
 
     }

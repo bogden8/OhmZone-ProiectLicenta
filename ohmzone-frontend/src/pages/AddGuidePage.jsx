@@ -7,6 +7,7 @@ export default function AddGuidePage() {
     const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
+    const [content, setContent] = useState(''); // ✅ nou
     const [deviceList, setDeviceList] = useState([]);
     const [brandList, setBrandList] = useState([]);
     const [categoryList, setCategoryList] = useState([]);
@@ -73,7 +74,7 @@ export default function AddGuidePage() {
         formData.append('authorID', authorID);
         formData.append('title', title);
         formData.append('part', 'N/A');
-        formData.append('content', 'Conținut ghid');
+        formData.append('content', content); // ✅ nou
 
         if (selectedCategoryId) {
             formData.append('categoryIdStr', selectedCategoryId);
@@ -86,11 +87,14 @@ export default function AddGuidePage() {
             formData.append('deviceIdStr', selectedDeviceId);
         } else if (newDeviceName) {
             formData.append('newDeviceName', newDeviceName);
-            if (selectedBrandId) formData.append('brandId', selectedBrandId);
-            if (newBrandName) formData.append('newBrandName', newBrandName);
-        } else {
-            setError('Selectează un device existent sau adaugă unul nou.');
-            return;
+            if (selectedBrandId) {
+                formData.append('brandIdStr', selectedBrandId);
+            } else if (newBrandName) {
+                formData.append('newBrandName', newBrandName);
+            } else {
+                setError('Selectează un brand existent sau adaugă unul nou.');
+                return;
+            }
         }
 
         steps.forEach(step => {
@@ -127,6 +131,17 @@ export default function AddGuidePage() {
                 <div>
                     <label className="block font-semibold">Titlu ghid</label>
                     <input type="text" className="w-full border p-2 rounded" value={title} onChange={e => setTitle(e.target.value)} required />
+                </div>
+
+                <div>
+                    <label className="block font-semibold">Conținut ghid</label>
+                    <textarea
+                        className="w-full border p-2 rounded"
+                        rows={5}
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        placeholder="Scrie aici conținutul general al ghidului (ex: avertismente, piese necesare etc.)"
+                    />
                 </div>
 
                 <div>

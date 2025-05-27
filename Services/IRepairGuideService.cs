@@ -15,6 +15,7 @@ namespace OhmZone_ProiectLicenta.Services
         Task<RepairGuide> CreateFullGuideAsync(
     string title,
     string categoryIdStr,
+    string? brandIdStr,
     string? newBrandName,
     string? deviceIdStr,
     string? newDeviceName,
