@@ -65,13 +65,13 @@ export default function RoboticsTutorialPage() {
                     <div className="flex gap-2">
                         <button
                             onClick={handleEdit}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                         >
                             Editează
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded"
+                            className="bg-red-600 hover:bg-red-700 text-black font-bold px-4 py-2 rounded"
                         >
                             Șterge
                         </button>

@@ -11,7 +11,7 @@ export default function HomePage() {
             <section className="text-white text-center py-20 bg-cover bg-center" style={{ backgroundImage: "url('/assets/home-banner.jpg')" }} >
                 <h1 className="text-6xl font-bold font-jersey mb-4">Caută un ghid de reparație</h1>
                 <Link to="/repair-guides" className="bg-white text-black px-6 py-2 rounded-full font-jersey hover:bg-gray-100">
-                    Start Fixing Your Stuff
+                    Începe să-ți repari lucrurile
                 </Link>
             </section>
 

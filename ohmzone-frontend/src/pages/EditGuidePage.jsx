@@ -221,7 +221,7 @@ export default function EditGuidePage() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                     >
                         Salvează modificările
                     </button>

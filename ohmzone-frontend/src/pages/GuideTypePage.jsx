@@ -11,8 +11,7 @@ export default function GuideTypePage() {
     useEffect(() => {
         async function fetchGuides() {
             try {
-                // 🔍 Caută device-ul după slug
-                const allDevicesRes = await axios.get('/api/device'); // sau creează un endpoint /api/device/by-slug
+                const allDevicesRes = await axios.get('/api/device');
                 const device = allDevicesRes.data.find(d => d.slug === deviceSlug);
 
                 if (!device) {
@@ -33,29 +32,30 @@ export default function GuideTypePage() {
     }, [deviceSlug]);
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">
+        <div className="bg-white min-h-screen flex flex-col items-center px-4 pt-10 animate-fade-in">
+            <h1 className="text-4xl font-bold font-jersey mb-10 text-center">
                 Ghiduri pentru {deviceName || deviceSlug}
             </h1>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p className="text-red-500 text-center">{error}</p>}
 
             {guides.length === 0 ? (
-                <p>Nu există ghiduri pentru acest model.</p>
+                <p className="text-center text-gray-600">Nu există ghiduri pentru acest model.</p>
             ) : (
-                <ul className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl w-full animate-slide-up">
                     {guides.map((guide) => (
-                        <li key={guide.guideID}>
-                            <Link
-                                to={`/guides/view/${guide.guideID}`}
-                                className="block bg-gray-100 p-4 rounded shadow hover:bg-gray-200"
-                            >
-                                {guide.title}
-                            </Link>
-                        </li>
+                        <Link
+                            key={guide.guideID}
+                            to={`/guides/view/${guide.guideID}`}
+                            className="bg-gray-300 hover:bg-gray-400 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-8 font-bold text-lg rounded shadow-md"
+                        >
+                            {guide.title}
+                        </Link>
                     ))}
-                </ul>
+                </div>
             )}
+
+            <div className="mt-20"></div>
         </div>
     );
 }

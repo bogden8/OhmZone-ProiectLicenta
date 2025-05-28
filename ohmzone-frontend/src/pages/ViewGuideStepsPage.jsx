@@ -80,13 +80,13 @@ export default function ViewGuideStepsPage() {
                             <div className="space-x-2">
                                 <button
                                     onClick={handleEdit}
-                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                                 >
                                     Modifică
                                 </button>
                                 <button
                                     onClick={handleDelete}
-                                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                                    className="bg-red-600 hover:bg-red-700 text-black font-bold px-4 py-2 rounded"
                                 >
                                     Șterge
                                 </button>

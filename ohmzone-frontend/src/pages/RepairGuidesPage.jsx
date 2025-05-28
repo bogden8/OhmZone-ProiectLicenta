@@ -59,7 +59,7 @@ export default function RepairGuidesPage() {
                 </div>
             </div>
 
-            <h2 className="text-center text-xl font-bold mt-10 mb-6">Alege o categorie</h2>
+            <h2 className="text-center text-xl font-bold mt-10 mb-6">Ce trebuie să repari?</h2>
             {error && <p className="text-center text-red-500">{error}</p>}
 
             {/* Categorii */}

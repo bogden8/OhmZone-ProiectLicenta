@@ -30,24 +30,26 @@ export default function ModelSelectionPage() {
     }, [subcategorySlug, brandSlug]);
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">
-                Modele disponibile pentru brandul {brandName || brandSlug}
+        <div className="bg-white min-h-screen flex flex-col items-center px-4 pt-10 animate-fade-in">
+            <h1 className="text-4xl font-bold font-jersey mb-10 text-center">
+                Modele disponibile pentru {brandName || brandSlug}
             </h1>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p className="text-red-500 text-center">{error}</p>}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl w-full animate-slide-up">
                 {models.map((model) => (
                     <Link
                         key={model.deviceID}
                         to={`/repair-guides/${categorySlug}/${subcategorySlug}/${brandSlug}/${model.slug}`}
-                        className="bg-gray-300 hover:bg-gray-400 p-6 rounded text-center font-semibold"
+                        className="bg-gray-300 hover:bg-gray-400 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-8 font-bold text-lg rounded shadow-md"
                     >
                         {model.model}
                     </Link>
                 ))}
             </div>
+
+            <div className="mt-20"></div>
         </div>
     );
 }

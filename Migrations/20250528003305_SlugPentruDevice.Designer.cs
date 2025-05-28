@@ -12,8 +12,8 @@ using OhmZone_ProiectLicenta.Data;
 namespace OhmZone_ProiectLicenta.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250525193948_SyncWithExistingDb")]
-    partial class SyncWithExistingDb
+    [Migration("20250528003305_SlugPentruDevice")]
+    partial class SlugPentruDevice
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

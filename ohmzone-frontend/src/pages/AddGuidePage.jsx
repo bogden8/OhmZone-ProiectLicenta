@@ -7,10 +7,11 @@ export default function AddGuidePage() {
     const navigate = useNavigate();
 
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState(''); // ✅ nou
+    const [content, setContent] = useState('');
     const [deviceList, setDeviceList] = useState([]);
     const [brandList, setBrandList] = useState([]);
     const [categoryList, setCategoryList] = useState([]);
+    const [subcategoryList, setSubcategoryList] = useState([]);
 
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [newDeviceName, setNewDeviceName] = useState('');
@@ -19,21 +20,16 @@ export default function AddGuidePage() {
     const [newBrandName, setNewBrandName] = useState('');
 
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
+    const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
+
     const [steps, setSteps] = useState([{ text: '', image: null }]);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        axios.get('/api/device')
-            .then(res => setDeviceList(res.data))
-            .catch(() => setDeviceList([]));
-
-        axios.get('/api/lookup/categories')
-            .then(res => setCategoryList(res.data))
-            .catch(() => setCategoryList([]));
-
-        axios.get('/api/lookup/brands')
-            .then(res => setBrandList(res.data))
-            .catch(() => setBrandList([]));
+        axios.get('/api/device').then(res => setDeviceList(res.data)).catch(() => setDeviceList([]));
+        axios.get('/api/lookup/categories').then(res => setCategoryList(res.data)).catch(() => setCategoryList([]));
+        axios.get('/api/lookup/brands').then(res => setBrandList(res.data)).catch(() => setBrandList([]));
+        axios.get('/api/lookup/subcategories').then(res => setSubcategoryList(res.data)).catch(() => setSubcategoryList([]));
     }, []);
 
     const handleStepChange = (index, field, value) => {
@@ -74,13 +70,17 @@ export default function AddGuidePage() {
         formData.append('authorID', authorID);
         formData.append('title', title);
         formData.append('part', 'N/A');
-        formData.append('content', content); // ✅ nou
+        formData.append('content', content);
 
-        if (selectedCategoryId) {
-            formData.append('categoryIdStr', selectedCategoryId);
-        } else {
+        if (selectedCategoryId) formData.append('categoryIdStr', selectedCategoryId);
+        else {
             setError('Selectează o categorie.');
             return;
+        }
+
+        const filteredSubcategories = subcategoryList.filter(s => s.categoryID === parseInt(selectedCategoryId));
+        if (filteredSubcategories.length > 0 && selectedSubcategoryId) {
+            formData.append('subcategoryIdStr', selectedSubcategoryId);
         }
 
         if (selectedDeviceId) {
@@ -110,17 +110,16 @@ export default function AddGuidePage() {
                 }
             });
 
-            if (res.data?.nextUrl) {
-                navigate(res.data.nextUrl);
-            } else {
-                navigate('/repair-guides');
-            }
+            if (res.data?.nextUrl) navigate(res.data.nextUrl);
+            else navigate('/repair-guides');
 
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.error || 'Eroare la salvare. Verifică câmpurile sau backendul.');
         }
     };
+
+    const filteredSubcategories = subcategoryList.filter(s => s.categoryID === parseInt(selectedCategoryId));
 
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow mt-10">
@@ -135,32 +134,32 @@ export default function AddGuidePage() {
 
                 <div>
                     <label className="block font-semibold">Conținut ghid</label>
-                    <textarea
-                        className="w-full border p-2 rounded"
-                        rows={5}
-                        value={content}
-                        onChange={e => setContent(e.target.value)}
-                        placeholder="Scrie aici conținutul general al ghidului (ex: avertismente, piese necesare etc.)"
-                    />
+                    <textarea className="w-full border p-2 rounded" rows={5} value={content} onChange={e => setContent(e.target.value)} />
                 </div>
 
                 <div>
                     <label className="block font-semibold">Categorie</label>
                     <select className="w-full border p-2 rounded" value={selectedCategoryId} onChange={e => setSelectedCategoryId(e.target.value)} required>
                         <option value="">-- Selectează --</option>
-                        {categoryList.map(c => (
-                            <option key={c.categoryID} value={c.categoryID}>{c.categoryName}</option>
-                        ))}
+                        {categoryList.map(c => <option key={c.categoryID} value={c.categoryID}>{c.categoryName}</option>)}
                     </select>
                 </div>
+
+                {filteredSubcategories.length > 0 && (
+                    <div>
+                        <label className="block font-semibold">Subcategorie</label>
+                        <select className="w-full border p-2 rounded mb-2" value={selectedSubcategoryId} onChange={e => setSelectedSubcategoryId(e.target.value)}>
+                            <option value="">-- Selectează --</option>
+                            {filteredSubcategories.map(s => <option key={s.subcategoryID} value={s.subcategoryID}>{s.name}</option>)}
+                        </select>
+                    </div>
+                )}
 
                 <div>
                     <label className="block font-semibold">Alege un device existent</label>
                     <select className="w-full border p-2 rounded" value={selectedDeviceId} onChange={e => setSelectedDeviceId(e.target.value)}>
                         <option value="">-- Selectează --</option>
-                        {deviceList.map(d => (
-                            <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>
-                        ))}
+                        {deviceList.map(d => <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>)}
                     </select>
                 </div>
 
@@ -170,15 +169,12 @@ export default function AddGuidePage() {
                     <label className="block font-semibold">Brand</label>
                     <select className="w-full border p-2 rounded mb-2" value={selectedBrandId} onChange={e => setSelectedBrandId(e.target.value)}>
                         <option value="">-- Selectează brand --</option>
-                        {brandList.map(b => (
-                            <option key={b.brandID} value={b.brandID}>{b.name}</option>
-                        ))}
+                        {brandList.map(b => <option key={b.brandID} value={b.brandID}>{b.name}</option>)}
                     </select>
                     <input type="text" className="w-full border p-2 rounded" placeholder="sau adaugă brand nou" value={newBrandName} onChange={e => setNewBrandName(e.target.value)} />
                 </div>
 
                 <hr className="my-4" />
-
                 <h2 className="text-lg font-semibold">Pași de reparație</h2>
                 {steps.map((step, idx) => (
                     <div key={idx} className="border p-4 mb-4 rounded bg-gray-50">
@@ -193,7 +189,7 @@ export default function AddGuidePage() {
                 </button>
 
                 <div className="pt-6">
-                    <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                    <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded">
                         Salvează ghidul
                     </button>
                 </div>

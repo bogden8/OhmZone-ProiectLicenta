@@ -42,7 +42,7 @@ export default function RoboticsPage() {
     return (
         <div className="max-w-[1200px] mx-auto p-6">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="font-jersey text-4xl">Learn. Build. Create.</h1>
+                <h1 className="font-jersey text-4xl">Învață. Construiește. Creează.</h1>
                 {isAdmin && (
                     <button
                         onClick={handleAdd}

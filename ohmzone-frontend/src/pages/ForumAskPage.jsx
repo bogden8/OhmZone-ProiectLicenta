@@ -145,7 +145,7 @@ export default function AskQuestionPage() {
 
                 <button
                     type="submit"
-                    className="bg-yellow-500 px-6 py-2 text-white font-bold rounded hover:bg-yellow-600"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                 >
                     Postează
                 </button>
