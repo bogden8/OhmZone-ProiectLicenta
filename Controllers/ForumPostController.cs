@@ -86,6 +86,7 @@ namespace OhmZone_ProiectLicenta.Controllers
         {
             var posts = await _context.ForumThreads
                 .Include(t => t.Author)
+                .Include(t => t.Category) // 🔥 trebuie să incluzi categoria
                 .OrderByDescending(t => t.DatePosted)
                 .Select(t => new
                 {
@@ -97,6 +98,7 @@ namespace OhmZone_ProiectLicenta.Controllers
                     About = t.About,
                     Device = t.Device,
                     DatePosted = t.DatePosted,
+                    CategoryName = t.Category.CategoryName, // 🔥 aici e cheia
                     Author = new
                     {
                         Username = t.Author.Username
@@ -106,6 +108,7 @@ namespace OhmZone_ProiectLicenta.Controllers
 
             return Ok(posts);
         }
+
 
 
         [HttpGet("{id}")]

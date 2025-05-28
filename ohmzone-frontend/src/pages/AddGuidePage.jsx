@@ -26,11 +26,32 @@ export default function AddGuidePage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        axios.get('/api/device').then(res => setDeviceList(res.data)).catch(() => setDeviceList([]));
         axios.get('/api/lookup/categories').then(res => setCategoryList(res.data)).catch(() => setCategoryList([]));
-        axios.get('/api/lookup/brands').then(res => setBrandList(res.data)).catch(() => setBrandList([]));
-        axios.get('/api/lookup/subcategories').then(res => setSubcategoryList(res.data)).catch(() => setSubcategoryList([]));
     }, []);
+
+    useEffect(() => {
+        if (selectedCategoryId) {
+            axios.get(`/api/lookup/subcategories/${selectedCategoryId}`)
+                .then(res => setSubcategoryList(res.data))
+                .catch(() => setSubcategoryList([]));
+        }
+    }, [selectedCategoryId]);
+
+    useEffect(() => {
+        if (selectedSubcategoryId) {
+            axios.get(`/api/lookup/brands/${selectedSubcategoryId}`)
+                .then(res => setBrandList(res.data))
+                .catch(() => setBrandList([]));
+        }
+    }, [selectedSubcategoryId]);
+
+    useEffect(() => {
+        if (selectedBrandId) {
+            axios.get(`/api/lookup/devices/${selectedBrandId}`)
+                .then(res => setDeviceList(res.data))
+                .catch(() => setDeviceList([]));
+        }
+    }, [selectedBrandId]);
 
     const handleStepChange = (index, field, value) => {
         const updatedSteps = [...steps];
@@ -73,15 +94,7 @@ export default function AddGuidePage() {
         formData.append('content', content);
 
         if (selectedCategoryId) formData.append('categoryIdStr', selectedCategoryId);
-        else {
-            setError('Selectează o categorie.');
-            return;
-        }
-
-        const filteredSubcategories = subcategoryList.filter(s => s.categoryID === parseInt(selectedCategoryId));
-        if (filteredSubcategories.length > 0 && selectedSubcategoryId) {
-            formData.append('subcategoryIdStr', selectedSubcategoryId);
-        }
+        if (selectedSubcategoryId) formData.append('subcategoryIdStr', selectedSubcategoryId);
 
         if (selectedDeviceId) {
             formData.append('deviceIdStr', selectedDeviceId);
@@ -119,8 +132,6 @@ export default function AddGuidePage() {
         }
     };
 
-    const filteredSubcategories = subcategoryList.filter(s => s.categoryID === parseInt(selectedCategoryId));
-
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow mt-10">
             <h1 className="text-2xl font-bold mb-6">Creează un nou ghid de reparație</h1>
@@ -145,32 +156,39 @@ export default function AddGuidePage() {
                     </select>
                 </div>
 
-                {filteredSubcategories.length > 0 && (
+                {subcategoryList.length > 0 && (
                     <div>
                         <label className="block font-semibold">Subcategorie</label>
                         <select className="w-full border p-2 rounded mb-2" value={selectedSubcategoryId} onChange={e => setSelectedSubcategoryId(e.target.value)}>
                             <option value="">-- Selectează --</option>
-                            {filteredSubcategories.map(s => <option key={s.subcategoryID} value={s.subcategoryID}>{s.name}</option>)}
+                            {subcategoryList.map(s => <option key={s.subcategoryID} value={s.subcategoryID}>{s.name}</option>)}
+                        </select>
+                    </div>
+                )}
+
+                {brandList.length > 0 && (
+                    <div>
+                        <label className="block font-semibold">Brand</label>
+                        <select className="w-full border p-2 rounded mb-2" value={selectedBrandId} onChange={e => setSelectedBrandId(e.target.value)}>
+                            <option value="">-- Selectează brand --</option>
+                            {brandList.map(b => <option key={b.brandID} value={b.brandID}>{b.name}</option>)}
+                        </select>
+                    </div>
+                )}
+
+                {deviceList.length > 0 && (
+                    <div>
+                        <label className="block font-semibold">Alege un device existent</label>
+                        <select className="w-full border p-2 rounded" value={selectedDeviceId} onChange={e => setSelectedDeviceId(e.target.value)}>
+                            <option value="">-- Selectează --</option>
+                            {deviceList.map(d => <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>)}
                         </select>
                     </div>
                 )}
 
                 <div>
-                    <label className="block font-semibold">Alege un device existent</label>
-                    <select className="w-full border p-2 rounded" value={selectedDeviceId} onChange={e => setSelectedDeviceId(e.target.value)}>
-                        <option value="">-- Selectează --</option>
-                        {deviceList.map(d => <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>)}
-                    </select>
-                </div>
-
-                <div>
                     <label className="block font-semibold">sau adaugă un device nou</label>
                     <input type="text" className="w-full border p-2 rounded mb-2" placeholder="Ex: iPhone 11" value={newDeviceName} onChange={e => setNewDeviceName(e.target.value)} />
-                    <label className="block font-semibold">Brand</label>
-                    <select className="w-full border p-2 rounded mb-2" value={selectedBrandId} onChange={e => setSelectedBrandId(e.target.value)}>
-                        <option value="">-- Selectează brand --</option>
-                        {brandList.map(b => <option key={b.brandID} value={b.brandID}>{b.name}</option>)}
-                    </select>
                     <input type="text" className="w-full border p-2 rounded" placeholder="sau adaugă brand nou" value={newBrandName} onChange={e => setNewBrandName(e.target.value)} />
                 </div>
 

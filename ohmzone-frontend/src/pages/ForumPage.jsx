@@ -6,19 +6,17 @@ const ForumPage = () => {
     const [type, setType] = useState('');
     const [about, setAbout] = useState('');
     const [category, setCategory] = useState('');
-    const [device, setDevice] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [devices, setDevices] = useState([]);
     const [categories, setCategories] = useState([]);
     const [posts, setPosts] = useState([]);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/api/device/with-details`)
+        fetch(`${API_BASE_URL}/api/forum-posts`)
             .then(res => res.json())
-            .then(data => setDevices(data))
-            .catch(() => setDevices([]));
+            .then(data => setPosts(data))
+            .catch(() => setPosts([]));
     }, []);
 
     useEffect(() => {
@@ -26,13 +24,6 @@ const ForumPage = () => {
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(() => setCategories([]));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${API_BASE_URL}/api/forum-posts`)
-            .then(res => res.json())
-            .then(data => setPosts(data))
-            .catch(() => setPosts([]));
     }, []);
 
     const handleAskQuestion = () => {
@@ -43,7 +34,6 @@ const ForumPage = () => {
         (!type || post.type === type) &&
         (!about || post.about === about) &&
         (!category || post.categoryName === category) &&
-        (!device || (post.deviceName && post.deviceName.toLowerCase().includes(device.toLowerCase()))) &&
         (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             post.content.toLowerCase().includes(searchTerm.toLowerCase()))
     )) : [];
@@ -72,7 +62,6 @@ const ForumPage = () => {
                         setType('');
                         setAbout('');
                         setCategory('');
-                        setDevice('');
                         setSearchTerm('');
                     }}>
                         All
@@ -98,18 +87,6 @@ const ForumPage = () => {
                             <option key={c.categoryID} value={c.categoryName}>{c.categoryName}</option>
                         ))}
                     </select>
-
-                    <select className="px-4 py-2 border rounded" value={device} onChange={(e) => setDevice(e.target.value)}>
-                        <option value="">Device</option>
-                        {devices
-                            .filter(d => !category || d.CategoryName === category)
-                            .map(d => (
-                                <option key={d.DeviceID} value={`${d.BrandName} ${d.Model}`}>
-                                    {d.BrandName} {d.Model}
-                                </option>
-                            ))}
-                    </select>
-
                 </div>
             </div>
 
@@ -127,11 +104,7 @@ const ForumPage = () => {
                                 {post.title}
                             </h2>
                             <p className="text-sm text-gray-500 mb-2">
-                                Publicat de <b>{post.author?.username || "Anonim"}</b> pe {new Date(post.datePosted).toLocaleString()}<br />
-                                <span className="italic">Categoria: <b>{post.categoryName || 'necunoscut'}</b></span><br />
-                                {post.deviceName && (
-                                    <span className="italic">Device: <b>{post.deviceName}</b></span>
-                                )}
+                                Publicat de <b>{post.author?.username || "Anonim"}</b> pe {new Date(post.datePosted).toLocaleString()}
                             </p>
                             {post.imageUrl && (
                                 <img src={`http://localhost:5097${post.imageUrl}`} alt="post" className="max-w-full h-auto rounded mb-2" />

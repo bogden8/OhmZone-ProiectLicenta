@@ -7,13 +7,10 @@ export default function AskQuestionPage() {
     const [title, setTitle] = useState('');
     const [type, setType] = useState('');
     const [about, setAbout] = useState('');
-    const [deviceID, setDeviceID] = useState('');
     const [content, setContent] = useState('');
     const [image, setImage] = useState(null);
-
-    const [categories, setCategories] = useState([]);
-    const [devices, setDevices] = useState([]);
     const [categoryID, setCategoryID] = useState('');
+    const [categories, setCategories] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
 
     const navigate = useNavigate();
@@ -32,11 +29,6 @@ export default function AskQuestionPage() {
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(err => console.error("Eroare la categorii:", err.message));
-
-        fetch(`${API_BASE_URL}/api/device/with-details`)
-            .then(res => res.json())
-            .then(data => setDevices(data))
-            .catch(() => setDevices([]));
     }, [navigate]);
 
     const handleSubmit = async (e) => {
@@ -49,7 +41,6 @@ export default function AskQuestionPage() {
         formData.append('Content', content);
         formData.append('Type', type);
         formData.append('About', about);
-        if (deviceID) formData.append('DeviceID', deviceID);
         formData.append('CategoryID', categoryID);
         if (image) formData.append('Image', image);
 
@@ -72,11 +63,6 @@ export default function AskQuestionPage() {
             alert("A apărut o eroare la trimiterea întrebării.");
         }
     };
-
-    // Resetăm device-ul dacă se schimbă categoria
-    useEffect(() => {
-        setDeviceID('');
-    }, [categoryID]);
 
     return (
         <div className="max-w-[800px] mx-auto px-4 py-10">
@@ -123,19 +109,6 @@ export default function AskQuestionPage() {
                             </option>
                         ))}
                     </select>
-
-                    <select value={deviceID} onChange={(e) => setDeviceID(e.target.value)} className="px-4 py-2 rounded">
-                        <option value="">Dispozitiv (opțional)</option>
-                        {devices
-                            .filter(d => !categoryID || d.CategoryID?.toString() === categoryID)
-                            .map(d => (
-                                <option key={d.deviceID} value={d.deviceID}>
-                                    {d.BrandName} {d.Model}
-                                </option>
-                            ))}
-                    </select>
-
-
                 </div>
 
                 <div>

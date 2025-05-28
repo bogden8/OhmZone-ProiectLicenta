@@ -123,30 +123,31 @@ export default function ForumPostPage() {
 
     return (
         <div className="max-w-[900px] mx-auto px-4 py-10">
+            <div className="flex justify-end mb-6">
+                <div className="flex flex-col space-y-2 items-end">
+                    {(isAuthor || (isAdmin && !isDeleted)) && (
+                        <button
+                            onClick={handleSoftDeletePost}
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-bold text-sm"
+                        >
+                            Șterge postarea 
+                        </button>
+                    )}
+                    {isAdmin && (
+                        <button
+                            onClick={handleHardDeletePost}
+                            className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-bold text-sm"
+                        >
+                            Șterge complet postarea
+                        </button>
+                    )}
+                </div>
+            </div>
+
             <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
             <p className="text-sm text-gray-600 mb-4">
                 Postat de <strong>{post.author?.username || 'Anonim'}</strong> pe {new Date(post.datePosted).toLocaleString()}
             </p>
-
-            <div className="mb-4 space-x-4">
-                {(isAuthor || (isAdmin && !isDeleted)) && (
-                    <button
-                        onClick={handleSoftDeletePost}
-                        className="text-yellow-600 font-semibold hover:underline"
-                    >
-                        Șterge postarea (logic)
-                    </button>
-                )}
-                {isAdmin && (
-                    <button
-                        onClick={handleHardDeletePost}
-                        className="text-red-600 font-bold hover:underline"
-                    >
-                        Șterge complet postarea (din DB)
-                    </button>
-                )}
-            </div>
-
 
             {post.imageUrl && (
                 <img
@@ -204,7 +205,7 @@ export default function ForumPostPage() {
                     />
                     <button
                         onClick={handleAddComment}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded"
                     >
                         Trimite comentariul
                     </button>
