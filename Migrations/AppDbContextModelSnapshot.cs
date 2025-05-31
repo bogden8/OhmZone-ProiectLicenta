@@ -36,7 +36,7 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Property<int>("AuthorID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryID")
+                    b.Property<int?>("CategoryID")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
@@ -76,6 +76,9 @@ namespace OhmZone_ProiectLicenta.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BrandID"));
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -106,6 +109,9 @@ namespace OhmZone_ProiectLicenta.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
@@ -124,6 +130,9 @@ namespace OhmZone_ProiectLicenta.Migrations
 
                     b.Property<int>("BrandID")
                         .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -331,6 +340,9 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Property<int>("CategoryID")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -394,9 +406,7 @@ namespace OhmZone_ProiectLicenta.Migrations
 
                     b.HasOne("OhmZone_ProiectLicenta.Models.Category", "Category")
                         .WithMany("ForumThreads")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CategoryID");
 
                     b.Navigation("Author");
 
@@ -436,7 +446,7 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.HasOne("OhmZone_ProiectLicenta.Models.Users", "User")
                         .WithMany("ForumReplies")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Thread");

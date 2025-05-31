@@ -188,6 +188,34 @@ namespace OhmZone_ProiectLicenta.Controllers
             return NoContent();
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpGet("mine")]
+        public async Task<IActionResult> GetMyPosts()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized();
+
+            var myPosts = await _context.ForumThreads
+                .Where(p => p.AuthorID == userId)
+                .Include(p => p.Category)
+                .OrderByDescending(p => p.DatePosted)
+                .Select(p => new
+                {
+                    p.ThreadID,
+                    p.Title,
+                    p.Content,
+                    p.ImageUrl,
+                    p.Type,
+                    p.About,
+                    p.Device,
+                    p.DatePosted,
+                    CategoryName = p.Category != null ? p.Category.CategoryName : null
+                })
+                .ToListAsync();
+
+            return Ok(myPosts);
+        }
 
 
 

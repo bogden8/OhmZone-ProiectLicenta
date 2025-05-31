@@ -3,7 +3,7 @@
     public class CreateForumPostDto
     {
         public string Title { get; set; }
-        public int CategoryID { get; set; }  
+        public int? CategoryID { get; set; }  
            
         public string Content { get; set; }
 

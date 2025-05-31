@@ -17,34 +17,47 @@ namespace OhmZone_ProiectLicenta.Controllers
 
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories() =>
-            Ok(await _context.Categories.ToListAsync());
+            Ok(await _context.Categories
+                .Select(c => new
+                {
+                    c.CategoryID,
+                    c.CategoryName,
+                    c.Slug,
+                    c.ImageUrl // ✅ adăugat
+                })
+                .ToListAsync());
 
         [HttpGet("subcategories")]
         public async Task<IActionResult> GetSubcategories() =>
             Ok(await _context.Subcategories
-                .Select(s => new { s.SubcategoryID, s.Name })
+                .Select(s => new { s.SubcategoryID, s.Name, s.ImageUrl }) // ✅ adăugat ImageUrl
                 .ToListAsync());
 
         [HttpGet("subcategories/{categoryId}")]
         public async Task<IActionResult> GetSubcategoriesByCategoryId(int categoryId) =>
             Ok(await _context.Subcategories
                 .Where(s => s.CategoryID == categoryId)
+                .Select(sc => new { sc.SubcategoryID, sc.Name, sc.Slug, sc.ImageUrl }) // ✅ adăugat
                 .ToListAsync());
 
         [HttpGet("brands")]
         public async Task<IActionResult> GetAllBrands() =>
-            Ok(await _context.Brands.ToListAsync());
+            Ok(await _context.Brands
+                .Select(b => new { b.BrandID, b.Name, b.Slug, b.ImageUrl }) // ✅ adăugat
+                .ToListAsync());
 
         [HttpGet("brands/{subcategoryId}")]
         public async Task<IActionResult> GetBrandsBySubcategoryId(int subcategoryId) =>
             Ok(await _context.Brands
                 .Where(b => b.SubcategoryID == subcategoryId)
+                .Select(b => new { b.BrandID, b.Name, b.Slug, b.ImageUrl }) // ✅ adăugat
                 .ToListAsync());
 
         [HttpGet("devices/{brandId}")]
         public async Task<IActionResult> GetDevices(int brandId) =>
             Ok(await _context.Devices
                 .Where(d => d.BrandID == brandId)
+                .Select(d => new { d.DeviceID, d.Model, d.Slug, d.ImageUrl }) // ✅ dacă vrei și la device
                 .ToListAsync());
 
         [HttpGet("guides/{deviceId}")]
@@ -62,7 +75,12 @@ namespace OhmZone_ProiectLicenta.Controllers
 
             var subcategories = await _context.Subcategories
                 .Where(sc => sc.CategoryID == category.CategoryID)
-                .Select(sc => new { sc.SubcategoryID, sc.Name, sc.Slug })
+                .Select(sc => new {
+                    sc.SubcategoryID,
+                    sc.Name,
+                    sc.Slug,
+                    sc.ImageUrl // ✅ adăugat
+                })
                 .ToListAsync();
 
             return Ok(subcategories);
@@ -77,7 +95,12 @@ namespace OhmZone_ProiectLicenta.Controllers
 
             var brands = await _context.Brands
                 .Where(b => b.SubcategoryID == subcategory.SubcategoryID)
-                .Select(b => new { b.BrandID, b.Name, b.Slug })
+                .Select(b => new {
+                    b.BrandID,
+                    b.Name,
+                    b.Slug,
+                    b.ImageUrl // ✅ adăugat
+                })
                 .ToListAsync();
 
             return Ok(brands);

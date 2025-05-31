@@ -24,16 +24,22 @@ export default function SubcategorySelectionPage() {
                 {subcategories.map(type => (
                     <div
                         key={type.subcategoryID}
-                        className="bg-gray-300 hover:bg-gray-400 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-8 font-bold text-lg rounded shadow-md"
+                        className="bg-gray-100 hover:bg-gray-200 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-6 rounded shadow-md flex flex-col items-center"
                         onClick={() => navigate(`/repair-guides/${categorySlug}/${type.slug}`)}
                     >
-                        {type.name}
+                        {type.imageUrl && (
+                            <img
+                                src={type.imageUrl}
+                                alt={type.name}
+                                className="w-20 h-20 object-contain mb-3"
+                            />
+                        )}
+                        <p className="font-bold text-lg">{type.name}</p>
                     </div>
                 ))}
             </div>
 
-            {/* Opțional: spațiu pentru design consistent */}
-            <div className="mt-20"></div>
+            <div className="mt-20" />
         </div>
     );
 }

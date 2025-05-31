@@ -64,7 +64,7 @@ export default function RoboticsPage() {
                             <img
                                 src={item.imageUrl}
                                 alt={item.title}
-                                className="object-cover h-full w-full"
+                                className="object-cover w-full h-[200px]"
                             />
                         </div>
                         <div className="p-6 flex-1">

@@ -42,9 +42,16 @@ export default function ModelSelectionPage() {
                     <Link
                         key={model.deviceID}
                         to={`/repair-guides/${categorySlug}/${subcategorySlug}/${brandSlug}/${model.slug}`}
-                        className="bg-gray-300 hover:bg-gray-400 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-8 font-bold text-lg rounded shadow-md"
+                        className="bg-gray-100 hover:bg-gray-200 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-4 rounded shadow-md"
                     >
-                        {model.model}
+                        {model.imageUrl && (
+                            <img
+                                src={model.imageUrl}
+                                alt={model.model}
+                                className="h-40 mx-auto mb-2 object-contain"
+                            />
+                        )}
+                        <p className="font-bold text-lg">{model.model}</p>
                     </Link>
                 ))}
             </div>

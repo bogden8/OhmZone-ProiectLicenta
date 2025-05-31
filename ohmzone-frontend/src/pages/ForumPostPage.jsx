@@ -17,10 +17,7 @@ export default function ForumPostPage() {
     useEffect(() => {
         fetch(`${API_BASE_URL}/api/forum-posts/${id}`)
             .then(res => res.json())
-            .then(data => {
-                console.log("DETALII POSTARE:", data);
-                setPost(data);
-            });
+            .then(data => setPost(data));
     }, [id, refresh]);
 
     const handleAddComment = async () => {
@@ -47,11 +44,9 @@ export default function ForumPostPage() {
                 setRefresh(prev => !prev);
             } else {
                 const errorText = await response.text();
-                console.error('Eroare server:', errorText);
-                alert('Eroare la trimiterea comentariului.');
+                alert('Eroare la trimiterea comentariului: ' + errorText);
             }
         } catch (err) {
-            console.error("Eroare la fetch:", err);
             alert("A apărut o eroare la rețea.");
         }
     };
@@ -123,45 +118,58 @@ export default function ForumPostPage() {
 
     return (
         <div className="max-w-[900px] mx-auto px-4 py-10">
-            <div className="flex justify-end mb-6">
-                <div className="flex flex-col space-y-2 items-end">
-                    {(isAuthor || (isAdmin && !isDeleted)) && (
-                        <button
-                            onClick={handleSoftDeletePost}
-                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-bold text-sm"
-                        >
-                            Șterge postarea 
-                        </button>
-                    )}
-                    {isAdmin && (
-                        <button
-                            onClick={handleHardDeletePost}
-                            className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-bold text-sm"
-                        >
-                            Șterge complet postarea
-                        </button>
-                    )}
+            {/* Buton admin - sus, în afara containerului */}
+            {isAdmin && (
+                <div className="flex justify-end mb-4">
+                    <button
+                        onClick={handleHardDeletePost}
+                        className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-bold text-sm"
+                    >
+                        Șterge complet postarea
+                    </button>
                 </div>
+            )}
+
+            {/* CONTAINER GRI */}
+            <div className="bg-gray-300 p-6 rounded-lg shadow mb-8 relative">
+                {/* Buton ștergere logică în colț sus dreapta */}
+                {(isAuthor || (isAdmin && !isDeleted)) && (
+                    <button
+                        onClick={handleSoftDeletePost}
+                        className="absolute top-4 right-4 bg-red-600 hover:bg-red-600 text-white px-3 py-1 rounded font-bold text-sm"
+                    >
+                        Șterge postarea
+                    </button>
+                )}
+
+                <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+                <p className="text-sm text-gray-600 mb-4">
+                    Postat de <strong>{post.author?.username || 'Anonim'}</strong> pe {new Date(post.datePosted).toLocaleString()}
+                </p>
+
+                {!isDeleted && (
+                    <p className="mb-6 whitespace-pre-wrap">{post.content}</p>
+                )}
+
+                {post.imageUrl && (
+                    <div className="mt-4">
+                        <a
+                            href={`http://localhost:5097${post.imageUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <img
+                                src={`http://localhost:5097${post.imageUrl}`}
+                                alt="poza"
+                                className="max-w-full max-h-[500px] object-contain rounded shadow"
+                            />
+                        </a>
+                        <p className="text-sm text-gray-500 italic text-center mt-2">
+                            Click pe imagine pentru a o deschide mai mare
+                        </p>
+                    </div>
+                )}
             </div>
-
-            <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
-            <p className="text-sm text-gray-600 mb-4">
-                Postat de <strong>{post.author?.username || 'Anonim'}</strong> pe {new Date(post.datePosted).toLocaleString()}
-            </p>
-
-            {post.imageUrl && (
-                <img
-                    src={`http://localhost:5097${post.imageUrl}`}
-                    alt="poza"
-                    className="max-w-full rounded mb-4"
-                />
-            )}
-
-            {isDeleted ? (
-                <p className="italic text-gray-500 mb-8">Postarea originală a fost ștearsă de autor. Comentariile rămân afișate mai jos.</p>
-            ) : (
-                <p className="mb-8 whitespace-pre-wrap">{post.content}</p>
-            )}
 
             <hr className="my-6" />
 

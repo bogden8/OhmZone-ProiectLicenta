@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from 'react';
+﻿// ⬇️ sus, în imports
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
@@ -15,6 +16,7 @@ export default function AddGuidePage() {
 
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
     const [newDeviceName, setNewDeviceName] = useState('');
+    const [deviceImage, setDeviceImage] = useState(null); // ✅ imagine pentru device nou
 
     const [selectedBrandId, setSelectedBrandId] = useState('');
     const [newBrandName, setNewBrandName] = useState('');
@@ -68,31 +70,23 @@ export default function AddGuidePage() {
         setError('');
 
         const token = localStorage.getItem('oz_token');
-        if (!token) {
-            setError('Nu ești autentificat.');
-            return;
-        }
+        if (!token) return setError('Nu ești autentificat.');
 
         let decoded;
         try {
             decoded = jwtDecode(token);
         } catch (err) {
-            setError('Token JWT invalid.');
-            return;
+            return setError('Token JWT invalid.');
         }
 
         const authorID = decoded.sub || decoded.userId || decoded.id;
-        if (!authorID) {
-            setError('Nu s-a putut extrage ID-ul utilizatorului.');
-            return;
-        }
+        if (!authorID) return setError('Nu s-a putut extrage ID-ul utilizatorului.');
 
         const formData = new FormData();
         formData.append('authorID', authorID);
         formData.append('title', title);
         formData.append('part', 'N/A');
         formData.append('content', content);
-
         if (selectedCategoryId) formData.append('categoryIdStr', selectedCategoryId);
         if (selectedSubcategoryId) formData.append('subcategoryIdStr', selectedSubcategoryId);
 
@@ -105,8 +99,11 @@ export default function AddGuidePage() {
             } else if (newBrandName) {
                 formData.append('newBrandName', newBrandName);
             } else {
-                setError('Selectează un brand existent sau adaugă unul nou.');
-                return;
+                return setError('Selectează un brand existent sau adaugă unul nou.');
+            }
+
+            if (deviceImage) {
+                formData.append('deviceImage', deviceImage); // ✅ trimitem imaginea
             }
         }
 
@@ -178,18 +175,25 @@ export default function AddGuidePage() {
 
                 {deviceList.length > 0 && (
                     <div>
-                        <label className="block font-semibold">Alege un device existent</label>
+                        <label className="block font-semibold">Device existent</label>
                         <select className="w-full border p-2 rounded" value={selectedDeviceId} onChange={e => setSelectedDeviceId(e.target.value)}>
                             <option value="">-- Selectează --</option>
-                            {deviceList.map(d => <option key={d.deviceID} value={d.deviceID}>{d.brandName} {d.model}</option>)}
+                            {deviceList.map(d => <option key={d.deviceID} value={d.deviceID}>{d.model}</option>)}
                         </select>
                     </div>
                 )}
 
                 <div>
-                    <label className="block font-semibold">sau adaugă un device nou</label>
-                    <input type="text" className="w-full border p-2 rounded mb-2" placeholder="Ex: iPhone 11" value={newDeviceName} onChange={e => setNewDeviceName(e.target.value)} />
-                    <input type="text" className="w-full border p-2 rounded" placeholder="sau adaugă brand nou" value={newBrandName} onChange={e => setNewBrandName(e.target.value)} />
+                    <label className="block font-semibold">sau adaugă device nou</label>
+                    <input type="text" className="w-full border p-2 rounded mb-2" placeholder="Ex: Galaxy S22" value={newDeviceName} onChange={e => setNewDeviceName(e.target.value)} />
+                    <input type="text" className="w-full border p-2 rounded mb-2" placeholder="sau brand nou" value={newBrandName} onChange={e => setNewBrandName(e.target.value)} />
+
+                    {newDeviceName && (
+                        <div className="mt-2">
+                            <label className="block font-semibold">Imagine device</label>
+                            <input type="file" accept="image/*" onChange={e => setDeviceImage(e.target.files[0])} />
+                        </div>
+                    )}
                 </div>
 
                 <hr className="my-4" />

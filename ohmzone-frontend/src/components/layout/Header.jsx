@@ -8,6 +8,7 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef();
     const [searchTerm, setSearchTerm] = useState('');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -20,7 +21,6 @@ export default function Header() {
         }
     };
 
-    // Închide dropdown-ul dacă dai click în afara lui
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,18 +34,22 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 bg-navbar-bg text-white py-3 shadow-md transition duration-300">
             <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
-                <div className="flex items-center gap-12">
+                <div className="flex items-center gap-4">
                     <Link to="/" className="text-5xl font-bold font-jersey hover:text-yellow-400 transition">
                         OhmZone
                     </Link>
-                    <nav className="flex items-center gap-8 font-bold text-sm">
-                        <Link to="/repair-guides" className="hover:text-yellow-400 transition">Fix your stuff</Link>
-                        <Link to="/robotics" className="hover:text-yellow-400 transition">Robotics</Link>
-                        <Link to="/forum" className="hover:text-yellow-400 transition">Forum</Link>
-                    </nav>
+                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-2xl ml-4">
+                        ☰
+                    </button>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <nav className={`md:flex gap-8 font-bold text-sm ${mobileMenuOpen ? 'flex flex-col absolute top-16 left-0 bg-navbar-bg w-full p-4 z-50' : 'hidden'} md:static md:flex-row md:items-center`}>
+                    <Link to="/repair-guides" className="hover:text-yellow-400 transition">Fix your stuff</Link>
+                    <Link to="/robotics" className="hover:text-yellow-400 transition">Robotics</Link>
+                    <Link to="/forum" className="hover:text-yellow-400 transition">Forum</Link>
+                </nav>
+
+                <div className="hidden md:flex items-center gap-4">
                     <input
                         type="text"
                         placeholder="search"
@@ -56,6 +60,14 @@ export default function Header() {
                     />
                     <button className="bg-gray-300 text-black rounded-md px-3 py-1 font-bold text-sm">RO</button>
 
+                    <Link
+                        to="/favorites"
+                        className="text-white text-2xl hover:text-yellow-400 transition"
+                        title="Ghiduri favorite"
+                    >
+                        ★
+                    </Link>
+
                     {user ? (
                         <div className="relative" ref={dropdownRef}>
                             <span
@@ -65,10 +77,16 @@ export default function Header() {
                                 {user.username}
                             </span>
                             {isOpen && (
-                                <div className="absolute right-0 mt-2 w-32 bg-white text-black rounded shadow-lg z-50">
+                                <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg z-50">
+                                    <Link
+                                        to="/forum/myposts"
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition border-b border-gray-300"
+                                    >
+                                        Vezi postările tale
+                                    </Link>
                                     <button
                                         onClick={handleLogout}
-                                        className="block w-full text-left px-4 py-2 hover:bg-gray-200 transition"
+                                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
                                     >
                                         Logout
                                     </button>

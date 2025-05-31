@@ -68,9 +68,16 @@ export default function RepairGuidesPage() {
                     <Link
                         key={cat.categoryID}
                         to={`/repair-guides/${encodeURIComponent(cat.slug || cat.categoryName.toLowerCase().replace(/\s+/g, '-'))}`}
-                        className="bg-gray-300 hover:bg-gray-400 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-8 font-bold text-lg rounded shadow-md"
+                        className="bg-gray-100 hover:bg-gray-200 transition duration-300 transform hover:scale-105 cursor-pointer text-center p-6 rounded shadow-md flex flex-col items-center"
                     >
-                        {cat.categoryName}
+                        {cat.imageUrl && (
+                            <img
+                                src={cat.imageUrl}
+                                alt={cat.categoryName}
+                                className="w-24 h-24 object-contain mb-2"
+                            />
+                        )}
+                        <p className="font-bold text-lg">{cat.categoryName}</p>
                     </Link>
                 ))}
             </div>

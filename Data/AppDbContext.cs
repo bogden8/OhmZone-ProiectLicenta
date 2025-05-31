@@ -79,9 +79,11 @@ namespace OhmZone_ProiectLicenta.Data
                 .HasForeignKey(fp => fp.CategoryID);
 
             modelBuilder.Entity<ForumPost>()
-                .HasOne(fp => fp.Author)
-                .WithMany(u => u.ForumThreads)
-                .HasForeignKey(fp => fp.AuthorID);
+    .HasOne(fp => fp.Category)
+    .WithMany(fc => fc.ForumThreads)
+    .HasForeignKey(fp => fp.CategoryID)
+    .IsRequired(false); // 🔧 face relația opțională
+
 
             // ——— ForumReplies ———
             modelBuilder.Entity<ForumReplies>()
@@ -90,9 +92,11 @@ namespace OhmZone_ProiectLicenta.Data
                 .HasForeignKey(fr => fr.ThreadID);
 
             modelBuilder.Entity<ForumReplies>()
-                .HasOne(fr => fr.User)
-                .WithMany(u => u.ForumReplies)
-                .HasForeignKey(fr => fr.UserID);
+    .HasOne(fr => fr.User)
+    .WithMany(u => u.ForumReplies)
+    .HasForeignKey(fr => fr.UserID)
+    .OnDelete(DeleteBehavior.Restrict); // ✅ fixă problema
+
 
             // ——— RoboticsTutorials ———
             modelBuilder.Entity<RoboticsTutorials>()

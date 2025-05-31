@@ -8,6 +8,8 @@ namespace OhmZone_ProiectLicenta.Models
         public string Name {  get; set; }
         public int SubcategoryID { get; set; }
         public string Slug { get; set; }
+        public string? ImageUrl { get; set; }
+
         public Subcategory Subcategory { get; set; }
         public List<Device> Devices { get; set; }
     }

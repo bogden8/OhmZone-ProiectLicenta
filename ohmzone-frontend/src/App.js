@@ -26,6 +26,7 @@ import EditGuidePage from './pages/EditGuidePage';
 import RoboticsTutorialPage from './pages/RoboticsTutorialPage';
 import EditTutorialPage from './pages/EditTutorialPage';
 import SearchPage from './pages/SearchPage';
+import MyPostsPage from './pages/MyPostsPage'; // ✅ Adăugat
 
 function App() {
     return (
@@ -57,6 +58,7 @@ function App() {
                         <Route path="/forum" element={<ForumPage />} />
                         <Route path="/forum/ask" element={<ForumAskPage />} />
                         <Route path="/forum/post/:id" element={<ForumPostPage />} />
+                        <Route path="/forum/myposts" element={<MyPostsPage />} /> {/* ✅ Adăugat */}
 
                         {/* Admin Only */}
                         <Route path="/admin/guides/full-create" element={<AddGuidePage />} />

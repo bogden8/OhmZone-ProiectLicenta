@@ -8,9 +8,10 @@ public class ForumPost
     public int ThreadID { get; set; }
     public string Title { get; set; }
 
-    public int CategoryID { get; set; }
+    public int? CategoryID { get; set; }  // ❗️ nullable
     [ForeignKey("CategoryID")]
-    public Category Category { get; set; }
+    public Category? Category { get; set; }  // ❗️ optional
+
 
     public int AuthorID { get; set; }
     [ForeignKey("AuthorID")]

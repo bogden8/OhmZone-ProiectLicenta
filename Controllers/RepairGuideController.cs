@@ -71,7 +71,7 @@ namespace OhmZone_ProiectLicenta.Controllers
         public async Task<IActionResult> CreateFullGuide(
     [FromForm] string title,
     [FromForm] string categoryIdStr,
-    [FromForm] string? brandIdStr,         // 🔧 NOU
+    [FromForm] string? brandIdStr,
     [FromForm] string? newBrandName,
     [FromForm] string? deviceIdStr,
     [FromForm] string? newDeviceName,
@@ -79,15 +79,37 @@ namespace OhmZone_ProiectLicenta.Controllers
     [FromForm] string? content,
     [FromForm] string authorID,
     [FromForm] List<string> stepTexts,
-    [FromForm] List<IFormFile> stepImages)
+    [FromForm] List<IFormFile> stepImages,
+    [FromForm] IFormFile? deviceImage // ✅ imagine device nou
+)
         {
             if (!int.TryParse(authorID, out int parsedAuthorId))
                 return BadRequest("AuthorID invalid");
 
-            // 🔧 Transmite și brandIdStr în serviciu
+            string? savedDeviceImageUrl = null;
+
+            // ✅ Dacă se încarcă imagine pentru un device nou, o salvăm
+            if (deviceImage != null && deviceImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "devices");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{deviceImage.FileName}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await deviceImage.CopyToAsync(stream);
+                }
+
+                savedDeviceImageUrl = $"/uploads/devices/{fileName}";
+            }
+
             var guide = await _svc.CreateFullGuideAsync(
                 title, categoryIdStr, brandIdStr, newBrandName, deviceIdStr,
-                newDeviceName, part, content, stepTexts, stepImages, parsedAuthorId);
+                newDeviceName, part, content, stepTexts, stepImages, parsedAuthorId,
+                savedDeviceImageUrl // ✅ poza device
+            );
 
             return Ok(new
             {
@@ -95,6 +117,8 @@ namespace OhmZone_ProiectLicenta.Controllers
                 nextUrl = $"/admin/guides/{guide.GuideID}/steps"
             });
         }
+
+
 
 
         [HttpGet("{id}/steps")]

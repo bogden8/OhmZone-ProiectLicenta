@@ -41,7 +41,7 @@ export default function AskQuestionPage() {
         formData.append('Content', content);
         formData.append('Type', type);
         formData.append('About', about);
-        formData.append('CategoryID', categoryID);
+        if (categoryID) formData.append('CategoryID', categoryID);
         if (image) formData.append('Image', image);
 
         try {

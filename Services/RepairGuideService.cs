@@ -124,17 +124,19 @@ namespace OhmZone_ProiectLicenta.Services
         }
 
         public async Task<RepairGuide> CreateFullGuideAsync(
-            string title,
-            string categoryIdStr,
-            string? brandIdStr,
-            string? newBrandName,
-            string? deviceIdStr,
-            string? newDeviceName,
-            string? part,
-            string? content,
-            List<string> stepTexts,
-            List<IFormFile> stepImages,
-            int authorID)
+    string title,
+    string categoryIdStr,
+    string? brandIdStr,
+    string? newBrandName,
+    string? deviceIdStr,
+    string? newDeviceName,
+    string? part,
+    string? content,
+    List<string> stepTexts,
+    List<IFormFile> stepImages,
+    int authorID,
+    string? deviceImageUrl // ✅ nou parametru
+)
         {
             Console.WriteLine("Saving guide with AuthorID: " + authorID);
 
@@ -148,6 +150,7 @@ namespace OhmZone_ProiectLicenta.Services
             if (!string.IsNullOrEmpty(categoryIdStr) && int.TryParse(categoryIdStr, out int catId))
                 categoryId = catId;
 
+            // 🧠 Logica device și brand
             if (!string.IsNullOrEmpty(deviceIdStr) && int.TryParse(deviceIdStr, out int parsedDeviceId))
             {
                 deviceId = parsedDeviceId;
@@ -177,7 +180,8 @@ namespace OhmZone_ProiectLicenta.Services
                 {
                     Model = newDeviceName,
                     BrandID = brandId.Value,
-                    Slug = GenerateSlug(newDeviceName)
+                    Slug = GenerateSlug(newDeviceName),
+                    ImageUrl = deviceImageUrl // ✅ aici salvăm imaginea
                 };
 
                 _context.Devices.Add(newDevice);
@@ -201,6 +205,7 @@ namespace OhmZone_ProiectLicenta.Services
                 Steps = new List<GuideStep>()
             };
 
+            // 🔧 Salvăm imaginile pașilor
             var uploadsPath = Path.Combine(_env.WebRootPath, "uploads", "guidestepsphotos");
             if (!Directory.Exists(uploadsPath))
                 Directory.CreateDirectory(uploadsPath);
@@ -231,6 +236,7 @@ namespace OhmZone_ProiectLicenta.Services
 
             return guide;
         }
+
 
         // 🔧 Funcție utilitară pentru generare slug
         private string GenerateSlug(string input)

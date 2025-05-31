@@ -8,6 +8,8 @@ namespace OhmZone_ProiectLicenta.Models
         public string Name { get; set; }
         public int CategoryID { get; set; }
         public string Slug { get; set; }
+        public string? ImageUrl { get; set; }
+
         public Category Category { get; set; }
         public List<Brand> Brands { get; set; }
 
