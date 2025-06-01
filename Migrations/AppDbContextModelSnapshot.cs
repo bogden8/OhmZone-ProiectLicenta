@@ -149,6 +149,32 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.ToTable("Devices");
                 });
 
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.FavoriteGuide", b =>
+                {
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GuideID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateSaved")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FavoriteID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RepairGuideGuideID")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserID", "GuideID");
+
+                    b.HasIndex("GuideID");
+
+                    b.HasIndex("RepairGuideGuideID");
+
+                    b.ToTable("FavoriteGuides");
+                });
+
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumReplies", b =>
                 {
                     b.Property<int>("ReplyID")
@@ -435,6 +461,29 @@ namespace OhmZone_ProiectLicenta.Migrations
                     b.Navigation("Brand");
                 });
 
+            modelBuilder.Entity("OhmZone_ProiectLicenta.Models.FavoriteGuide", b =>
+                {
+                    b.HasOne("OhmZone_ProiectLicenta.Models.RepairGuide", "Guide")
+                        .WithMany()
+                        .HasForeignKey("GuideID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OhmZone_ProiectLicenta.Models.RepairGuide", null)
+                        .WithMany("FavoriteGuides")
+                        .HasForeignKey("RepairGuideGuideID");
+
+                    b.HasOne("OhmZone_ProiectLicenta.Models.Users", "User")
+                        .WithMany("FavoriteGuides")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Guide");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.ForumReplies", b =>
                 {
                     b.HasOne("ForumPost", "Thread")
@@ -559,6 +608,8 @@ namespace OhmZone_ProiectLicenta.Migrations
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.RepairGuide", b =>
                 {
+                    b.Navigation("FavoriteGuides");
+
                     b.Navigation("GuideComments");
 
                     b.Navigation("Steps");
@@ -571,6 +622,8 @@ namespace OhmZone_ProiectLicenta.Migrations
 
             modelBuilder.Entity("OhmZone_ProiectLicenta.Models.Users", b =>
                 {
+                    b.Navigation("FavoriteGuides");
+
                     b.Navigation("ForumReplies");
 
                     b.Navigation("ForumThreads");

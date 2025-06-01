@@ -21,6 +21,7 @@ namespace OhmZone_ProiectLicenta.Models
 
         public string Role { get; set; } = "User";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public List<FavoriteGuide> FavoriteGuides { get; set; }
 
         public ICollection<RepairGuide> RepairGuides { get; set; }
         public ICollection<ForumPost> ForumThreads { get; set; }

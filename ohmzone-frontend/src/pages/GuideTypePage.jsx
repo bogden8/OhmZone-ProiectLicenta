@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function GuideTypePage() {
@@ -7,6 +7,7 @@ export default function GuideTypePage() {
     const [guides, setGuides] = useState([]);
     const [error, setError] = useState('');
     const [deviceName, setDeviceName] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchGuides() {
@@ -33,6 +34,21 @@ export default function GuideTypePage() {
 
     return (
         <div className="bg-white min-h-screen flex flex-col items-center px-4 pt-10 animate-fade-in">
+
+            {/* Banner cu text suprapus */}
+            <div className="relative w-full h-48 rounded-none overflow-hidden mb-10">
+                <img
+                    src="/assets/magazin-online-soon.jpg"
+                    alt="Magazin online în curând"
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center px-4">
+                    <h2 className="text-white text-2xl md:text-3xl font-bold text-center">
+                        Vom avea un magazin online cu piese și unelete în curând!
+                    </h2>
+                </div>
+            </div>
+
             <h1 className="text-4xl font-bold font-jersey mb-10 text-center">
                 Ghiduri pentru {deviceName || deviceSlug}
             </h1>
@@ -55,7 +71,15 @@ export default function GuideTypePage() {
                 </div>
             )}
 
-            <div className="mt-20"></div>
+            {/* Buton spre forum */}
+            <div className="mt-20 mb-10">
+                <button
+                    onClick={() => navigate('/forum/ask')}
+                    className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300 shadow-md"
+                >
+                    Nu găsești ce cauți? Pune o întrebare pe forum
+                </button>
+            </div>
         </div>
     );
 }

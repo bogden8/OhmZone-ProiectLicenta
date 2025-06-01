@@ -26,11 +26,13 @@ import EditGuidePage from './pages/EditGuidePage';
 import RoboticsTutorialPage from './pages/RoboticsTutorialPage';
 import EditTutorialPage from './pages/EditTutorialPage';
 import SearchPage from './pages/SearchPage';
-import MyPostsPage from './pages/MyPostsPage'; // ✅ Adăugat
-
+import MyPostsPage from './pages/MyPostsPage';
+import FavoriteGuidesPage from './pages/FavoriteGuidesPage';
+import ScrollToTop from './components/layout/ScrollToTop';
 function App() {
     return (
         <Router>
+            <ScrollToTop /> 
             <div className="min-h-screen flex flex-col">
                 <Header />
                 <main className="flex-1">
@@ -46,7 +48,7 @@ function App() {
                         <Route path="/repair-guides/:categorySlug/:subcategorySlug/:brandSlug" element={<ModelSelectionPage />} />
                         <Route path="/repair-guides/:categorySlug/:subcategorySlug/:brandSlug/:deviceSlug" element={<GuideTypePage />} />
                         <Route path="/guides/view/:guideId" element={<ViewGuideStepsPage />} />
-
+                        <Route path="/favorites" element={<FavoriteGuidesPage />} />
                         {/* Robotics */}
                         <Route path="/robotics" element={<RoboticsPage />} />
                         <Route path="/robotics/new-tutorial" element={<AddTutorialPage />} />

@@ -18,15 +18,15 @@ namespace OhmZone_ProiectLicenta.Models
         public float Rating { get; set; }
         public DateTime DatePublished { get; set; }
 
-        // 🔄 Relații clare
         public Device Device { get; set; }
         public Category Category { get; set; }
         public Users Author { get; set; }
 
-        // 🔄 Nume clar pentru listă de pași
         public List<GuideStep> Steps { get; set; } = new();
         public List<GuideComments> GuideComments { get; set; } = new();
+        public List<FavoriteGuide> FavoriteGuides { get; set; } = new(); // 🔥 relație pentru favorite
     }
+
 
 
 

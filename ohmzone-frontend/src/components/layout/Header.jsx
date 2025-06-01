@@ -52,7 +52,7 @@ export default function Header() {
                 <div className="hidden md:flex items-center gap-4">
                     <input
                         type="text"
-                        placeholder="search"
+                        placeholder="caută"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                         onKeyDown={handleSearchKey}
