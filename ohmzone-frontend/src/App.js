@@ -29,6 +29,7 @@ import SearchPage from './pages/SearchPage';
 import MyPostsPage from './pages/MyPostsPage';
 import FavoriteGuidesPage from './pages/FavoriteGuidesPage';
 import ScrollToTop from './components/layout/ScrollToTop';
+import RightToRepairPage from './pages/RightToRepairPage';
 function App() {
     return (
         <Router>
@@ -49,6 +50,7 @@ function App() {
                         <Route path="/repair-guides/:categorySlug/:subcategorySlug/:brandSlug/:deviceSlug" element={<GuideTypePage />} />
                         <Route path="/guides/view/:guideId" element={<ViewGuideStepsPage />} />
                         <Route path="/favorites" element={<FavoriteGuidesPage />} />
+                        <Route path="/right-to-repair" element={<RightToRepairPage />} />
                         {/* Robotics */}
                         <Route path="/robotics" element={<RoboticsPage />} />
                         <Route path="/robotics/new-tutorial" element={<AddTutorialPage />} />

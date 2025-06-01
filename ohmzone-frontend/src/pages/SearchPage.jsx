@@ -20,10 +20,11 @@ export default function SearchPage() {
     }, [query]);
 
     const getLink = (item) => {
-        if (item.type === 'repair') return `/repair-guides/view/${item.id}`;
+        if (item.type === 'repair') return `/guides/view/${item.id}`; 
         if (item.type === 'robotics') return `/robotics/${item.id}`;
         return '#';
     };
+
 
     return (
         <div className="max-w-4xl mx-auto p-6">

@@ -96,16 +96,27 @@ export default function RepairGuidesPage() {
                 ))}
             </div>
 
-            <div className="bg-gray-300 mt-16 py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8 rounded animate-fade-in">
-                <p className="text-black font-bold text-sm max-w-md">
-                    Importanța dreptului de a repara
-                </p>
+            <div className="bg-gray-300 mt-16 py-12 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 max-w-6xl mx-auto rounded animate-fade-in">
+                <div className="flex-1 space-y-4">
+                    <h3 className="text-black font-jersey font-bold text-4xl">Importanța dreptului de a repara</h3>
+                    <p className="text-black text-lg leading-relaxed">
+                        Ai cumpăra o mașină dacă nu ai putea schimba anvelopele?
+                        <br />
+                        Atunci de ce ai cumpăra un telefon dacă nu poți înlocui bateria?
+                    </p>
+                    <Link to="/right-to-repair" className="text-red-600 hover:text-red-800 font-semibold underline text-lg">
+                        Află mai multe
+                    </Link>
+                </div>
                 <img
                     src="/assets/right-repair.jpg"
                     alt="Right to repair"
-                    className="w-52 h-auto rounded-xl object-cover"
+                    className="w-64 h-auto rounded-xl object-cover"
                 />
             </div>
+
+
+
         </div>
     );
 }

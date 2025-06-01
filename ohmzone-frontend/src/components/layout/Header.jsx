@@ -34,7 +34,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 bg-navbar-bg text-white py-3 shadow-md transition duration-300">
             <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     <Link to="/" className="text-5xl font-bold font-jersey hover:text-yellow-400 transition">
                         OhmZone
                     </Link>
@@ -43,11 +43,12 @@ export default function Header() {
                     </button>
                 </div>
 
-                <nav className={`md:flex gap-8 font-bold text-sm ${mobileMenuOpen ? 'flex flex-col absolute top-16 left-0 bg-navbar-bg w-full p-4 z-50' : 'hidden'} md:static md:flex-row md:items-center`}>
-                    <Link to="/repair-guides" className="hover:text-yellow-400 transition">Fix your stuff</Link>
-                    <Link to="/robotics" className="hover:text-yellow-400 transition">Robotics</Link>
+                <nav className={`md:flex gap-6 font-bold text-sm ${mobileMenuOpen ? 'flex flex-col absolute top-16 left-0 bg-navbar-bg w-full p-4 z-50' : 'hidden'} md:static md:flex-row md:items-center`}>
+                    <Link to="/repair-guides" className="hover:text-yellow-400 transition">Ghiduri de reparații</Link>
+                    <Link to="/robotics" className="hover:text-yellow-400 transition">Robotică</Link>
                     <Link to="/forum" className="hover:text-yellow-400 transition">Forum</Link>
                 </nav>
+
 
                 <div className="hidden md:flex items-center gap-4">
                     <input
